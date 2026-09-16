@@ -27,6 +27,7 @@ public class ChessBoard {
     }
 
     public ChessBoard() {
+        resetBoard();
     }
 
     /**
