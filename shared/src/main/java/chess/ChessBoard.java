@@ -36,7 +36,7 @@ public class ChessBoard {
      * @param piece    the piece to add
      */
     public void addPiece(ChessPosition position, ChessPiece piece) {
-        board[8-position.getRow()][position.getColumn()-1] = piece;
+        board[position.getRow()-1][position.getColumn()-1] = piece;
     }
 
     /**
@@ -47,7 +47,7 @@ public class ChessBoard {
      * position
      */
     public ChessPiece getPiece(ChessPosition position) {
-        return board[8-position.getRow()][position.getColumn()-1];
+        return board[position.getRow()-1][position.getColumn()-1];
     }
 
     /**
@@ -57,17 +57,17 @@ public class ChessBoard {
     public void resetBoard() {
         for (int row = 1; row <=8; row++) {
             for (int col = 1; col <= 8; col++) {
-                ChessPosition temp = new ChessPosition(row ,col);
+                ChessPosition temp = new ChessPosition(row, col);
                 if (this.getPiece(temp) != null) {
                     this.addPiece(temp, null);
-                }
-                if (row==2) {
-                    this.addPiece(temp, new ChessPiece(ChessGame.TeamColor.BLACK, ChessPiece.PieceType.PAWN));
                 }
                 if (row==7) {
                     this.addPiece(temp, new ChessPiece(ChessGame.TeamColor.BLACK, ChessPiece.PieceType.PAWN));
                 }
-                if (row==1) {
+                if (row==2) {
+                    this.addPiece(temp, new ChessPiece(ChessGame.TeamColor.WHITE, ChessPiece.PieceType.PAWN));
+                }
+                if (row==8) {
                     if(col==1 || col ==8) {
                         this.addPiece(temp, new ChessPiece(ChessGame.TeamColor.BLACK, ChessPiece.PieceType.ROOK));
                     } else if (col ==2 || col ==7) {
@@ -80,7 +80,7 @@ public class ChessBoard {
                         this.addPiece(temp, new ChessPiece(ChessGame.TeamColor.BLACK, ChessPiece.PieceType.KING));
                     }
                 }
-                if (row==8) {
+                if (row==1) {
                     if(col==1 || col ==8) {
                         this.addPiece(temp, new ChessPiece(ChessGame.TeamColor.WHITE, ChessPiece.PieceType.ROOK));
                     } else if (col ==2 || col ==7) {
