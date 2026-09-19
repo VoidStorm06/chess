@@ -63,7 +63,7 @@ public class KingMove implements MovementRule {
                 moves.add(new ChessMove(position, pos, null));
             }
         }
-        if (row+1 <= 8 && col+1 <= 8) {
+        if (row+1 <= 8 && col-1 >= 1) {
             ChessPosition pos = new ChessPosition(row+1, col-1);
             if (board.getPiece(pos) == null || board.getPiece(pos).getTeamColor() != this.piece.getTeamColor()) {
                 moves.add(new ChessMove(position, pos, null));
