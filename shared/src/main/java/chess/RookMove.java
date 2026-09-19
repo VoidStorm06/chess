@@ -44,6 +44,8 @@ public class RookMove implements MovementRule{
             } else if (board.getPiece(pos).getTeamColor() != this.piece.getTeamColor()) {
                 moves.add(new ChessMove(position, pos, null));
                 break;
+            } else {
+                break;
             }
         }
         for (int i = 1; i <= 8; i++) {
@@ -55,6 +57,8 @@ public class RookMove implements MovementRule{
                 moves.add(new ChessMove(position, pos, null));
             } else if (board.getPiece(pos).getTeamColor() != this.piece.getTeamColor()) {
                 moves.add(new ChessMove(position, pos, null));
+                break;
+            } else {
                 break;
             }
         }
@@ -68,6 +72,8 @@ public class RookMove implements MovementRule{
             } else if (board.getPiece(pos).getTeamColor() != this.piece.getTeamColor()) {
                 moves.add(new ChessMove(position, pos, null));
                 break;
+            } else {
+                break;
             }
         }
 
@@ -80,6 +86,8 @@ public class RookMove implements MovementRule{
                 moves.add(new ChessMove(position, pos, null));
             } else if (board.getPiece(pos).getTeamColor() != this.piece.getTeamColor()) {
                 moves.add(new ChessMove(position, pos, null));
+                break;
+            } else {
                 break;
             }
         }
