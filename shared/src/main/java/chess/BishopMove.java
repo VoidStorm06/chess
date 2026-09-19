@@ -16,19 +16,7 @@ public class BishopMove implements MovementRule {
         this.piece=piece;
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (o == null || getClass() != o.getClass()) {
-            return false;
-        }
-        BishopMove that = (BishopMove) o;
-        return Objects.equals(board, that.board) && Objects.equals(position, that.position) && Objects.equals(piece, that.piece);
-    }
 
-    @Override
-    public int hashCode() {
-        return Objects.hash(board, position, piece);
-    }
 
     @Override
     public Collection<ChessMove> pieceMoves() {
@@ -71,9 +59,8 @@ public class BishopMove implements MovementRule {
                 break;
             }
         }
-
         for (int i = 1; i <= 8; i++) {
-            if (col - i < 1 || row+1 > 8) {
+            if (col - i < 1 || row+i > 8) {
                 break;
             }
             ChessPosition pos = new ChessPosition(row+i, col - i);
