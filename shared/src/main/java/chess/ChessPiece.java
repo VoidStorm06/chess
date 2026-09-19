@@ -66,6 +66,24 @@ public class ChessPiece {
      * @return Collection of valid moves
      */
     public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition myPosition) {
-        throw new RuntimeException("Not implemented");
+        if (this.getPieceType() == PieceType.KING) {
+            KingMove king = new KingMove(board, myPosition, this);
+            return king.pieceMoves();
+        } else if (this.getPieceType()==PieceType.PAWN) {
+            PawnMove pawn = new PawnMove(board, myPosition, this);
+            return pawn.pieceMoves();
+        } else if (this.getPieceType()==PieceType.QUEEN) {
+            QueenMove queen = new QueenMove(board, myPosition, this);
+            return queen.pieceMoves();
+        } else if (this.getPieceType()==PieceType.ROOK) {
+            RookMove rook = new  RookMove(board, myPosition, this);
+            return rook.pieceMoves();
+        } else if (this.getPieceType()==PieceType.BISHOP) {
+            BishopMove bishop = new BishopMove(board, myPosition, this);
+            return bishop.pieceMoves();
+        } else {
+            KnightMove knight = new KnightMove(board, myPosition, this);
+                return knight.pieceMoves();
+        }
     }
 }
