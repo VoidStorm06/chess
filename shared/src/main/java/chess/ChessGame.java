@@ -24,7 +24,7 @@ public class ChessGame {
         bKing = new ChessPosition(8, 5);
         currColor = TeamColor.WHITE;
         wMoves = board.getPiece(wKing).pieceMoves(board, wKing);
-        bMoves = board.getPiece(wKing).pieceMoves(board, wKing);;
+        bMoves = board.getPiece(wKing).pieceMoves(board, wKing);
         updateChessMoves();
     }
 
