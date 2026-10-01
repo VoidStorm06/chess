@@ -26,10 +26,6 @@ public class ChessGame {
         updateChessMoves();
     }
 
-
-
-
-
     private void updateChessMoves() {
         wMoves.clear();
         bMoves.clear();
@@ -103,7 +99,30 @@ public class ChessGame {
      * @return True if the specified team is in check
      */
     public boolean isInCheck(TeamColor teamColor) {
-        throw new RuntimeException("Not implemented");
+        for (int i = 1; i <= 8; i++) {
+            for (int j = 1; j <= 8; j++) {
+                ChessPosition pos = new ChessPosition(i, j);
+                ChessMove move;
+                if (board.getPiece(pos) != null && board.getPiece(pos).getTeamColor() != teamColor) {
+                    if (teamColor == TeamColor.WHITE) {
+                        move = new ChessMove(pos, wKing, null);
+                        if (bMoves.contains(move)) {
+                            return true;
+                        } else {
+                            continue;
+                        }
+                    } else {
+                        move = new ChessMove(pos, bKing, null);
+                        if (wMoves.contains(move)) {
+                            return true;
+                        } else  {
+                            continue;
+                        }
+                    }
+                }
+            }
+        }
+        return false;
     }
 
     /**
@@ -124,7 +143,16 @@ public class ChessGame {
      * @return True if the specified team is in stalemate, otherwise false
      */
     public boolean isInStalemate(TeamColor teamColor) {
-
+        if (teamColor == TeamColor.WHITE) {
+            if (wMoves.isEmpty() && !isInCheck(teamColor)) {
+                return true;
+            }
+        } else {
+            if (bMoves.isEmpty() && !isInCheck(teamColor)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /**
