@@ -23,7 +23,25 @@ public class ChessGame {
         wKing = new ChessPosition(1, 5);
         bKing = new ChessPosition(8, 5);
         currColor = TeamColor.WHITE;
+        wMoves = board.getPiece(wKing).pieceMoves(board, wKing);
+        bMoves = board.getPiece(wKing).pieceMoves(board, wKing);;
         updateChessMoves();
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        ChessGame chessGame = (ChessGame) o;
+        return Objects.equals(board, chessGame.board) && Objects.equals(wKing, chessGame.wKing)
+                && Objects.equals(bKing, chessGame.bKing) && currColor == chessGame.currColor
+                && Objects.equals(wMoves, chessGame.wMoves) && Objects.equals(bMoves, chessGame.bMoves);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(board, wKing, bKing, currColor, wMoves, bMoves);
     }
 
     private void updateChessMoves() {
