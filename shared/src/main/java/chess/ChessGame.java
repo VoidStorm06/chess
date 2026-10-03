@@ -64,6 +64,21 @@ public class ChessGame {
             }
         }
     }
+
+
+    private Collection<ChessMove> collectMovesColor(TeamColor color) {
+        Collection<ChessMove> moves = board.getPiece(wKing).pieceMoves(board, wKing);
+        moves.clear();
+        for (int i = 1; i <= 8; i++) {
+            for (int j = 1; j<= 8; j++) {
+                ChessPosition pos = new ChessPosition(i , j);
+                if (board.getPiece(pos) != null && board.getPiece(pos).getTeamColor() == color) {
+                    moves.addAll(validMoves(pos));
+                }
+            }
+        }
+        return moves;
+    }
     /**
      * @return Which team's turn it is
      */
@@ -224,16 +239,11 @@ public class ChessGame {
      * @return True if the specified team is in checkmate
      */
     public boolean isInCheckmate(TeamColor teamColor) {
-        if (teamColor == TeamColor.WHITE) {
-            if (validMoves(wKing).isEmpty() && isInCheck(teamColor)) {
-                return true;
-            }
-        } else {
-            if (validMoves(bKing).isEmpty() && isInCheck(teamColor)) {
-                return true;
-            }
+        Collection<ChessMove> moves = collectMovesColor(teamColor);
+        if (moves.isEmpty() && isInCheck(teamColor)) {
+            return true;
         }
-        return false;
+    return false;
     }
 
     /**
@@ -244,14 +254,9 @@ public class ChessGame {
      * @return True if the specified team is in stalemate, otherwise false
      */
     public boolean isInStalemate(TeamColor teamColor) {
-        if (teamColor == TeamColor.WHITE) {
-            if (wMoves.isEmpty() && !isInCheck(teamColor)) {
-                return true;
-            }
-        } else {
-            if (bMoves.isEmpty() && !isInCheck(teamColor)) {
-                return true;
-            }
+        Collection<ChessMove> moves = collectMovesColor(teamColor);
+        if (moves.isEmpty() && !isInCheck(teamColor)) {
+            return true;
         }
         return false;
     }

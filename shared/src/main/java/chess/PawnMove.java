@@ -128,7 +128,7 @@ public class PawnMove implements MovementRule {
         return moves;
     }
 
-    public boolean checkPromotion(ChessPosition position, ChessPiece piece) {
+    private boolean checkPromotion(ChessPosition position, ChessPiece piece) {
         if (piece.getTeamColor() == ChessGame.TeamColor.WHITE) {
             if (position.getRow() ==8) {
                 return true;
