@@ -98,7 +98,17 @@ public class ChessGame {
     public Collection<ChessMove> validMoves(ChessPosition startPosition) {
         ChessPiece piece = board.getPiece(startPosition);
         Collection<ChessMove> moves = piece.pieceMoves(board, startPosition);
-        return moves;
+        Collection<ChessMove> newMoves = piece.pieceMoves(board, startPosition);
+        newMoves.clear();
+        for (var move : moves) {
+            try {
+                makeMove(move);
+            } catch (InvalidMoveException e) {
+                continue;
+            }
+            newMoves.add(move);
+        }
+        return newMoves;
     }
 
     /**
