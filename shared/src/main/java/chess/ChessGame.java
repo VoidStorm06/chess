@@ -112,13 +112,22 @@ public class ChessGame {
         if (piece == null) {
             throw new InvalidMoveException("No Piece there");
         }
+        if (piece.getTeamColor() != currColor) {
+            throw new InvalidMoveException("Not current turn of color");
+        }
         Collection<ChessMove> moves = piece.pieceMoves(board, move.getStartPosition());
         if (!moves.contains(move)) {
             throw new InvalidMoveException("Not a Legal Move for the Piece");
         }
         ChessPiece enemyPiece = board.getPiece(move.getEndPosition());
         board.addPiece(move.getStartPosition(), null);
-        board.addPiece(move.getEndPosition(), piece);
+        if (piece.getTeamColor() == TeamColor.WHITE && piece.getPieceType() == ChessPiece.PieceType.PAWN && move.getEndPosition().getRow() ==8) {
+            board.addPiece(move.getEndPosition(), new ChessPiece(TeamColor.WHITE, move.getPromotionPiece()));
+        } else if (piece.getTeamColor() == TeamColor.BLACK && piece.getPieceType() == ChessPiece.PieceType.PAWN && move.getEndPosition().getRow() ==1) {
+            board.addPiece(move.getEndPosition(), new ChessPiece(TeamColor.BLACK, move.getPromotionPiece()));
+        } else  {
+            board.addPiece(move.getEndPosition(), piece);
+        }
         updateChessMoves();
         if (isInCheck(piece.getTeamColor())) {
             board.addPiece(move.getStartPosition(), piece);
