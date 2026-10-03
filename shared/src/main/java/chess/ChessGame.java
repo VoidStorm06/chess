@@ -98,31 +98,6 @@ public class ChessGame {
     public Collection<ChessMove> validMoves(ChessPosition startPosition) {
         ChessPiece piece = board.getPiece(startPosition);
         Collection<ChessMove> moves = piece.pieceMoves(board, startPosition);
-        if (piece.getPieceType() == ChessPiece.PieceType.KING) {
-            Collection<ChessMove> kingMoves = piece.pieceMoves(board, startPosition);
-            if (piece.getTeamColor() == TeamColor.WHITE) {
-                kingMoves.removeIf(move -> {
-                    for (var bMove : bMoves) {
-                        if (move.getEndPosition().equals(bMove.getEndPosition())) {
-                            return true;
-                        }
-                    }
-                    return false;
-                });
-            } else {
-                kingMoves.removeIf(move -> {
-                    for (var wMove : wMoves) {
-                        if (move.getEndPosition() == wMove.getEndPosition()) {
-                            return true;
-                        }
-                    }
-                    return false;
-                });
-            }
-            if (kingMoves.isEmpty()) {
-                return kingMoves;
-            }
-        }
         return moves;
     }
 
@@ -133,7 +108,28 @@ public class ChessGame {
      * @throws InvalidMoveException if move is invalid
      */
     public void makeMove(ChessMove move) throws InvalidMoveException {
-        throw new RuntimeException("Not implemented");
+        ChessPiece piece = board.getPiece(move.getStartPosition());
+        if (piece == null) {
+            throw new InvalidMoveException("No Piece there");
+        }
+        Collection<ChessMove> moves = piece.pieceMoves(board, move.getStartPosition());
+        if (!moves.contains(move)) {
+            throw new InvalidMoveException("Not a Legal Move for the Piece");
+        }
+        ChessPiece enemyPiece = board.getPiece(move.getEndPosition());
+        board.addPiece(move.getStartPosition(), null);
+        board.addPiece(move.getEndPosition(), piece);
+        updateChessMoves();
+        if (isInCheck(piece.getTeamColor())) {
+            board.addPiece(move.getStartPosition(), piece);
+            board.addPiece(move.getEndPosition(), enemyPiece);
+            throw new InvalidMoveException("Move Leaves King in Check");
+        }
+        if (piece.getTeamColor() == TeamColor.WHITE) {
+            currColor = TeamColor.BLACK;
+        } else {
+            currColor = TeamColor.WHITE;
+        }
 
     }
 
