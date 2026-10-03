@@ -98,12 +98,29 @@ public class ChessGame {
     public Collection<ChessMove> validMoves(ChessPosition startPosition) {
         ChessPiece piece = board.getPiece(startPosition);
         Collection<ChessMove> moves = piece.pieceMoves(board, startPosition);
-        if (board.getPiece(startPosition).getPieceType() == ChessPiece.PieceType.KING) {
-            Collection<ChessMove> kingMoves = board.getPiece(startPosition).pieceMoves(board, startPosition);
-            if (board.getPiece(startPosition).getTeamColor() == TeamColor.WHITE) {
-                kingMoves.removeIf(move -> bMoves.contains(move));
+        if (piece.getPieceType() == ChessPiece.PieceType.KING) {
+            Collection<ChessMove> kingMoves = piece.pieceMoves(board, startPosition);
+            if (piece.getTeamColor() == TeamColor.WHITE) {
+                kingMoves.removeIf(move -> {
+                    for (var bMove : bMoves) {
+                        if (move.getEndPosition().equals(bMove.getEndPosition())) {
+                            return true;
+                        }
+                    }
+                    return false;
+                });
             } else {
-                kingMoves.removeIf(move -> wMoves.contains(move));
+                kingMoves.removeIf(move -> {
+                    for (var wMove : wMoves) {
+                        if (move.getEndPosition() == wMove.getEndPosition()) {
+                            return true;
+                        }
+                    }
+                    return false;
+                });
+            }
+            if (kingMoves.isEmpty()) {
+                return kingMoves;
             }
         }
         return moves;
@@ -161,11 +178,11 @@ public class ChessGame {
      */
     public boolean isInCheckmate(TeamColor teamColor) {
         if (teamColor == TeamColor.WHITE) {
-            if (board.getPiece(wKing).pieceMoves(board, wKing).isEmpty() && isInCheck(teamColor)) {
+            if (validMoves(wKing).isEmpty() && isInCheck(teamColor)) {
                 return true;
             }
         } else {
-            if (board.getPiece(bKing).pieceMoves(board, bKing).isEmpty() && isInCheck(teamColor)) {
+            if (validMoves(bKing).isEmpty() && isInCheck(teamColor)) {
                 return true;
             }
         }
