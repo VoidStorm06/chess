@@ -25,6 +25,8 @@ public class Server {
 
     }
 
+    //handlers here
+
     public int run(int desiredPort) {
         javalin.start(desiredPort);
         return javalin.port();
