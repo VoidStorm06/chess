@@ -29,29 +29,39 @@ public class MemoryDAO implements DAO {
     };
     public AuthData createUser(UserData user) {
         userList.put(user.username(), user);
-        return createAuth(user.username());
+        return createAuth(user);
     };
     public UserData getUser(UserData user) {
         return userList.get(user.username());
     };
-    public int createNewGame (ChessGame game, String gameName) {
-        var gameData = new GameData(gameID, "", "" , gameName ,game);
+    public void createNewGame () {
+        var gameData = new GameData(gameID, "", "" , "" , new ChessGame());
         gameList.put(gameID, gameData);
         gameID++;
-        return 0;
     };
     public HashMap<Integer, GameData> listAllGames() {
-        return null;
+        return gameList;
     };
-    public void updateGame() {
+    public void updateGame(String user, ChessGame.TeamColor color, Integer gameID) {
+        var prevGameData = gameList.get(gameID);
+        GameData gameData;
+        if (color == ChessGame.TeamColor.BLACK) {
+             gameData = new GameData(gameID, prevGameData.whiteUsername(), user,
+                     prevGameData.gameName(), prevGameData.game());
+        } else {
+            gameData = new GameData(gameID, user, prevGameData.blackUsername(),
+                    prevGameData.gameName(), prevGameData.game());
+        }
+        gameList.remove(gameID);
+        gameList.put(gameID, gameData);
     };
-    public AuthData createAuth(String username) {
-        AuthData authData = new AuthData(UUID.randomUUID().toString(), username);
+    public AuthData createAuth(UserData user) {
+        AuthData authData = new AuthData(UUID.randomUUID().toString(), user.username());
         authList.put(authData.username(), authData);
         return authData;
     };
-    public AuthData getAuth(String username) {
-        return authList.get(username);
+    public AuthData getAuth(UserData user) {
+        return authList.get(user.username());
     };
     public void deleteAuth(AuthData authData) {
         authList.remove(authData.username());

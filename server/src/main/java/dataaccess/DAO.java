@@ -12,11 +12,11 @@ public interface DAO {
     void clearAllDatabases() throws DataAccessException;
     AuthData createUser(UserData user) throws DataAccessException;
     UserData getUser(UserData user) throws DataAccessException;
-    int createNewGame(ChessGame game, String gameName) throws DataAccessException;
+    void createNewGame() throws DataAccessException;
     HashMap<Integer, GameData> listAllGames() throws DataAccessException;
-    void updateGame() throws DataAccessException;
-    AuthData createAuth(String username) throws DataAccessException;
-    AuthData getAuth(String username) throws DataAccessException;
+    void updateGame(String user, ChessGame.TeamColor color, Integer gameID) throws DataAccessException;
+    AuthData createAuth(UserData user) throws DataAccessException;
+    AuthData getAuth(UserData user) throws DataAccessException;
     void deleteAuth(AuthData authData) throws DataAccessException;
 
 }
