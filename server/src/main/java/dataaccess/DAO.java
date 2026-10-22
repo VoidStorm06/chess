@@ -16,7 +16,7 @@ public interface DAO {
     HashMap<Integer, GameData> listAllGames() throws DataAccessException;
     void updateGame(GameData gameData) throws DataAccessException;
     AuthData createAuth(UserData user) throws DataAccessException;
-    AuthData getAuth(UserData user) throws DataAccessException;
+    AuthData getAuth(AuthData authData) throws DataAccessException;
     void deleteAuth(AuthData authData) throws DataAccessException;
 
 }
