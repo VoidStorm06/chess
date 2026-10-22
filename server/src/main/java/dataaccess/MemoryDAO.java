@@ -5,8 +5,6 @@ import model.AuthData;
 import model.GameData;
 import model.UserData;
 
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.UUID;
 
@@ -21,15 +19,15 @@ public class MemoryDAO implements DAO {
         userList.clear();
         authList.clear();
         gameID = 1;
-    };
+    }
 
     public void createUser(UserData user) {
         userList.put(user.username(), user);
-    };
+    }
 
     public UserData getUser(UserData user) {
         return userList.get(user.username());
-    };
+    }
 
     public int createNewGame (String gameName) {
         var gameData = new GameData(gameID, null, null,
@@ -38,7 +36,7 @@ public class MemoryDAO implements DAO {
         int tempID=gameID;
         gameID++;
         return tempID;
-    };
+    }
 
     public GameData getGame(Integer gameID)  {
         return gameList.get(gameID);
@@ -46,24 +44,24 @@ public class MemoryDAO implements DAO {
 
     public HashMap<Integer, GameData> listAllGames() {
         return gameList;
-    };
+    }
 
     public void updateGame(GameData gameData) {
         gameList.remove(gameData.gameID());
         gameList.put(gameData.gameID(), gameData);
-    };
+    }
 
     public AuthData createAuth(UserData user) {
         AuthData authData = new AuthData(user.username(), UUID.randomUUID().toString());
         authList.put(authData.authToken(), authData);
         return authData;
-    };
+    }
 
     public AuthData getAuth(AuthData authData) {
         return authList.get(authData.authToken());
-    };
+    }
 
     public void deleteAuth(AuthData authData) {
         authList.remove(authData.authToken());
-    };
+    }
 }

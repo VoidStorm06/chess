@@ -1,7 +1,6 @@
 package server;
 
 import com.google.gson.Gson;
-import com.google.gson.JsonObject;
 import dataaccess.DataAccessException;
 import dataaccess.MemoryDAO;
 import io.javalin.*;
@@ -10,7 +9,6 @@ import model.AuthData;
 import model.UserData;
 import service.*;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;

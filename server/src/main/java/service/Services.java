@@ -1,6 +1,5 @@
 package service;
 
-import chess.ChessGame;
 import dataaccess.DataAccessException;
 import dataaccess.MemoryDAO;
 import model.AuthData;

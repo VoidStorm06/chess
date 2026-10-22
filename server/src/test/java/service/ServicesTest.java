@@ -1,17 +1,12 @@
 package service;
 
-import com.google.gson.Gson;
 import dataaccess.DataAccessException;
 import dataaccess.MemoryDAO;
-import model.AuthData;
 import model.UserData;
-import org.eclipse.jetty.util.log.Log;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -22,14 +17,14 @@ class ServicesTest {
 
     @Test
     void registerUserExists() throws DataAccessException {
-        var authToken = tempServices.registerUser(tempUser);
+        tempServices.registerUser(tempUser);
         var returnUser = tempDAO.getUser(tempUser);
         assertEquals(tempUser, returnUser);
     }
 
     @Test
     void registerUserDoesNotExist() throws DataAccessException {
-        var authToken = tempServices.registerUser(tempUser);
+        tempServices.registerUser(tempUser);
         var returnUser = tempDAO.getUser(tempUser);
         tempUser = new UserData("bill", "bill", "bill");
         assertNotEquals(tempUser, returnUser);
@@ -37,9 +32,9 @@ class ServicesTest {
 
     @Test
     void cannotRegisterSameUsername() throws DataAccessException {
-        var authToken = tempServices.registerUser(tempUser);
+        tempServices.registerUser(tempUser);
         var duplicateUser = new UserData("bob", "bob", "bob");
-        assertThrows(DataAccessException.class, () -> {tempServices.registerUser(duplicateUser);});
+        assertThrows(DataAccessException.class, () -> tempServices.registerUser(duplicateUser));
     }
 
     @Test
@@ -55,7 +50,7 @@ class ServicesTest {
         var authToken = tempServices.registerUser(tempUser);
         var logoutRequest = new LogoutRequest(authToken.authToken());
         tempServices.logOut(logoutRequest);
-        assertThrows(DataAccessException.class, () -> {tempServices.logOut(logoutRequest);});
+        assertThrows(DataAccessException.class, () -> tempServices.logOut(logoutRequest));
     }
 
     @Test
@@ -71,7 +66,7 @@ class ServicesTest {
     @Test
     void logInFailed() throws DataAccessException {
         var loginRequest = new LoginRequest("bob", "bob");
-        assertThrows(DataAccessException.class, () -> {tempServices.logIn(loginRequest);});
+        assertThrows(DataAccessException.class, () -> tempServices.logIn(loginRequest));
     }
 
     @Test
@@ -87,9 +82,9 @@ class ServicesTest {
 
     @Test
     void failCreateNewGame() throws DataAccessException {
-        var authToken = tempServices.registerUser(tempUser);
+        tempServices.registerUser(tempUser);
         CreateGameRequest request = new CreateGameRequest("", "Name");
-        assertThrows(DataAccessException.class, () -> {tempServices.createNewGame(request);});
+        assertThrows(DataAccessException.class, () -> tempServices.createNewGame(request));
 
     }
 
@@ -97,9 +92,9 @@ class ServicesTest {
     void testViewGames() throws DataAccessException {
         var authToken = tempServices.registerUser(tempUser);
         CreateGameRequest request = new CreateGameRequest(authToken.authToken(), "");
-        CreateGameResponse response = tempServices.createNewGame(request);
+        tempServices.createNewGame(request);
         request = new CreateGameRequest(authToken.authToken(), "");
-        response = tempServices.createNewGame(request);
+        tempServices.createNewGame(request);
         Collection<ShowGamesResponse> gameList = tempServices.viewAllGames(authToken.authToken());
         assertEquals(2, gameList.size());
     }
@@ -108,9 +103,9 @@ class ServicesTest {
     void testJoinGameBlack() throws DataAccessException {
         var authToken = tempServices.registerUser(tempUser);
         CreateGameRequest request = new CreateGameRequest(authToken.authToken(), "");
-        CreateGameResponse response = tempServices.createNewGame(request);
-        JoinRequest jrequest = new JoinRequest("BLACK", 1);
-        tempServices.joinCurrGame(authToken.authToken(), jrequest);
+        tempServices.createNewGame(request);
+        JoinRequest joinRequest = new JoinRequest("BLACK", 1);
+        tempServices.joinCurrGame(authToken.authToken(), joinRequest);
         Collection<ShowGamesResponse> gameList = tempServices.viewAllGames(authToken.authToken());
         ShowGamesResponse game = new ArrayList<>(gameList).getFirst();
         assertEquals(tempUser.username(), game.blackUsername());
@@ -120,9 +115,9 @@ class ServicesTest {
     void testJoinGameWhite() throws DataAccessException {
         var authToken = tempServices.registerUser(tempUser);
         CreateGameRequest request = new CreateGameRequest(authToken.authToken(), "");
-        CreateGameResponse response = tempServices.createNewGame(request);
-        JoinRequest jrequest = new JoinRequest("WHITE", 1);
-        tempServices.joinCurrGame(authToken.authToken(), jrequest);
+        tempServices.createNewGame(request);
+        JoinRequest joinRequest = new JoinRequest("WHITE", 1);
+        tempServices.joinCurrGame(authToken.authToken(), joinRequest);
         Collection<ShowGamesResponse> gameList = tempServices.viewAllGames(authToken.authToken());
         ShowGamesResponse game = new ArrayList<>(gameList).getFirst();
         assertEquals(tempUser.username(), game.whiteUsername());
@@ -131,18 +126,18 @@ class ServicesTest {
     @Test
     void joinNonexistentGame() throws DataAccessException {
         var authToken = tempServices.registerUser(tempUser);
-        JoinRequest jrequest = new JoinRequest("WHITE", 1);
-        assertThrows(DataAccessException.class, () -> {tempServices
-                    .joinCurrGame(authToken.authToken(), jrequest);});
+        JoinRequest joinRequest = new JoinRequest("WHITE", 1);
+        assertThrows(DataAccessException.class, () -> tempServices
+                    .joinCurrGame(authToken.authToken(), joinRequest));
     }
 
     @Test
     void deleteDatabases() throws DataAccessException {
         var authToken = tempServices.registerUser(tempUser);
         CreateGameRequest request = new CreateGameRequest(authToken.authToken(), "");
-        CreateGameResponse response = tempServices.createNewGame(request);
+        tempServices.createNewGame(request);
         request = new CreateGameRequest(authToken.authToken(), "");
-        response = tempServices.createNewGame(request);
+        tempServices.createNewGame(request);
         Collection<ShowGamesResponse> gameList = tempServices.viewAllGames(authToken.authToken());
         assertEquals(2, gameList.size());
         tempServices.deleteDatabases();
