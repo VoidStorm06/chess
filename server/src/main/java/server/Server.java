@@ -23,7 +23,7 @@ public class Server {
         services = new Services(new MemoryDAO());
         javalin = Javalin.create(config -> config.staticFiles.add("web"))
                 //deletes database
-                .delete("/db", context -> context.result("hello"))
+                .delete("/db", this::deleteHandler)
         //registers user
                 .post("/user", this::registerHandler)
         //logs in
@@ -42,8 +42,18 @@ public class Server {
 
     //handlers here
 
-    private void exceptionHandler(DataAccessException exception, Context context) {
+    public int run(int desiredPort) {
+        javalin.start(desiredPort);
+        return javalin.port();
+    }
 
+    public void stop() {
+        javalin.stop();
+    }
+
+    private void exceptionHandler(DataAccessException exception, Context context) {
+        context.status(exception.messageToCode());
+        context.result(exception.toJson());
     }
 
     private void registerHandler(Context context) throws DataAccessException {
@@ -89,14 +99,5 @@ public class Server {
 
     private void deleteHandler(Context context) throws DataAccessException {
         services.deleteDatabases();
-    }
-
-    public int run(int desiredPort) {
-        javalin.start(desiredPort);
-        return javalin.port();
-    }
-
-    public void stop() {
-        javalin.stop();
     }
 }

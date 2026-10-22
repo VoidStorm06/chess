@@ -112,7 +112,7 @@ class ServicesTest {
         JoinRequest jrequest = new JoinRequest("BLACK", 1);
         tempServices.joinCurrGame(authToken.authToken(), jrequest);
         Collection<ShowGamesResponse> gameList = tempServices.viewAllGames(authToken.authToken());
-        ShowGamesResponse game = new ArrayList<>(gameList).get(0);
+        ShowGamesResponse game = new ArrayList<>(gameList).getFirst();
         assertEquals(tempUser.username(), game.blackUsername());
     }
 
@@ -124,12 +124,12 @@ class ServicesTest {
         JoinRequest jrequest = new JoinRequest("WHITE", 1);
         tempServices.joinCurrGame(authToken.authToken(), jrequest);
         Collection<ShowGamesResponse> gameList = tempServices.viewAllGames(authToken.authToken());
-        ShowGamesResponse game = new ArrayList<>(gameList).get(0);
+        ShowGamesResponse game = new ArrayList<>(gameList).getFirst();
         assertEquals(tempUser.username(), game.whiteUsername());
     }
 
     @Test
-    void joinNonexistantGame() throws DataAccessException {
+    void joinNonexistentGame() throws DataAccessException {
         var authToken = tempServices.registerUser(tempUser);
         JoinRequest jrequest = new JoinRequest("WHITE", 1);
         assertThrows(DataAccessException.class, () -> {tempServices

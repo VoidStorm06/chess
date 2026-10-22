@@ -20,7 +20,7 @@ public class Services {
 
     public AuthData registerUser(UserData user) throws DataAccessException {
         if (DAO.getUser(user) != null)  {
-            throw new DataAccessException("Already Taken");
+            throw new DataAccessException("Already taken");
         }
         DAO.createUser(user);
         return DAO.createAuth(user);
