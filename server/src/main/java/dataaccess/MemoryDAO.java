@@ -50,7 +50,7 @@ public class MemoryDAO implements DAO {
 
     public void updateGame(GameData gameData) {
         gameList.remove(gameData.gameID());
-        gameList.put(gameID, gameData);
+        gameList.put(gameData.gameID(), gameData);
     };
 
     public AuthData createAuth(UserData user) {

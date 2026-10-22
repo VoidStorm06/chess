@@ -83,19 +83,18 @@ public class Services {
         }
         GameData updateGame;
         if (request.playerColor().equals("BLACK")) {
-            if (game.blackUsername() == null) {
-                updateGame = new GameData(request.gameID(), game.whiteUsername(),
-                        DAO.getAuth(authData).username(), game.gameName(), game.game());
-            } else {
+            if (game.blackUsername() != null) {
                 throw new DataAccessException("Already taken");
             }
+            updateGame = new GameData(request.gameID(), game.whiteUsername(),
+                    DAO.getAuth(authData).username(), game.gameName(), game.game());
         } else if (request.playerColor().equals("WHITE")) {
-            if (game.whiteUsername() == null) {
-                updateGame = new GameData(request.gameID(), DAO.getAuth(authData).username(),
-                        game.blackUsername(), game.gameName(), game.game());
-            } else {
+            if (game.whiteUsername() != null) {
                 throw new DataAccessException("Already taken");
+
             }
+            updateGame = new GameData(request.gameID(), DAO.getAuth(authData).username(),
+                    game.blackUsername(), game.gameName(), game.game());
         } else {
             throw new DataAccessException("bad request");
         }
