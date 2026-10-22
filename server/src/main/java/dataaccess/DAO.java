@@ -9,14 +9,24 @@ import java.util.Collection;
 import java.util.HashMap;
 
 public interface DAO {
-    void clearAllDatabases() throws DataAccessException;
-    void createUser(UserData user) throws DataAccessException;
-    UserData getUser(UserData user) throws DataAccessException;
-    void createNewGame() throws DataAccessException;
-    HashMap<Integer, GameData> listAllGames() throws DataAccessException;
-    void updateGame(GameData gameData) throws DataAccessException;
-    AuthData createAuth(UserData user) throws DataAccessException;
-    AuthData getAuth(AuthData authData) throws DataAccessException;
-    void deleteAuth(AuthData authData) throws DataAccessException;
 
+    void clearAllDatabases() throws DataAccessException;
+
+    void createUser(UserData user) throws DataAccessException;
+
+    UserData getUser(UserData user) throws DataAccessException;
+
+    int createNewGame(String gameName) throws DataAccessException;
+
+    HashMap<Integer, GameData> listAllGames() throws DataAccessException;
+
+    void updateGame(GameData gameData) throws DataAccessException;
+
+    GameData getGame(Integer gameID) throws DataAccessException;
+
+    AuthData createAuth(UserData user) throws DataAccessException;
+
+    AuthData getAuth(AuthData authData) throws DataAccessException;
+
+    void deleteAuth(AuthData authData) throws DataAccessException;
 }

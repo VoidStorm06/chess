@@ -4,7 +4,11 @@ import chess.ChessGame;
 import dataaccess.DataAccessException;
 import dataaccess.MemoryDAO;
 import model.AuthData;
+import model.GameData;
 import model.UserData;
+
+import java.util.ArrayList;
+import java.util.Collection;
 
 public class Services {
 
@@ -32,26 +36,60 @@ public class Services {
     }
 
     public void logOut(LogoutRequest logoutRequest)  throws DataAccessException {
-        AuthData authToken = DAO.getAuth(new AuthData(logoutRequest.authToken(), ""));
-        if (authToken == null) {
-            throw new DataAccessException("unauthorized");
-        }
+        AuthData authToken = new AuthData("", logoutRequest.authToken());
+        validAuthToken(authToken);
         DAO.deleteAuth(authToken);
     }
 
-    public void createNewGame(ChessGame game)  throws DataAccessException {
+    public CreateGameResponse createNewGame(CreateGameRequest createGameRequest) throws DataAccessException {
+        AuthData authToken = new AuthData("", createGameRequest.authToken());
+        validAuthToken(authToken);
+        int gameID = DAO.createNewGame(createGameRequest.gameName());
+        return new CreateGameResponse(gameID);
 
     }
 
-    public void viewAllGames()  throws DataAccessException {
-
+    public Collection<ShowGamesResponse> viewAllGames(String request) throws DataAccessException {
+        AuthData authToken = new AuthData("", request);
+        validAuthToken(authToken);
+        var gameList = DAO.listAllGames();
+        ArrayList<ShowGamesResponse> games = new ArrayList<>();
+        for (var value : gameList.values()) {
+            ShowGamesResponse response = new ShowGamesResponse(value.gameID(),
+                    value.whiteUsername(), value.blackUsername(), value.gameName());
+            games.add(response);
+        }
+        return games;
     }
 
-    public void joinCurrGame(int gameID)  throws DataAccessException {
-
+    public void joinCurrGame(String authToken, JoinRequest request)  throws DataAccessException {
+        AuthData authData = new AuthData("", authToken);
+        validAuthToken(authData);
+        GameData game = DAO.getGame(request.gameID());
+        if (game == null) {
+            throw new DataAccessException("bad request");
+        }
+        GameData updateGame;
+        if (request.color().equals("BLACK") && game.blackUsername().isEmpty()) {
+            updateGame = new GameData(request.gameID(), game.whiteUsername(),
+                    DAO.getAuth(authData).username(), game.gameName(), game.game());
+        } else if (request.color().equals("WHITE") && game.whiteUsername().isEmpty()) {
+            updateGame = new GameData(request.gameID(), DAO.getAuth(authData).username(),
+                    game.blackUsername(), game.gameName(), game.game());
+        } else {
+            throw new DataAccessException("bad request");
+        }
+        DAO.updateGame(updateGame);
     }
+
     public void deleteDatabases()  throws DataAccessException {
+        DAO.clearAllDatabases();
+    }
 
+    public void validAuthToken(AuthData authToken) throws DataAccessException {
+        if (DAO.getAuth(authToken) == null) {
+            throw new DataAccessException("unauthorized");
+        }
     }
 }
 

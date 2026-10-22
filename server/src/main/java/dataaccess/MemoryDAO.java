@@ -31,12 +31,18 @@ public class MemoryDAO implements DAO {
         return userList.get(user.username());
     };
 
-    public void createNewGame () {
+    public int createNewGame (String gameName) {
         var gameData = new GameData(gameID, "", "" ,
-                "" , new ChessGame());
+                gameName , new ChessGame());
         gameList.put(gameID, gameData);
+        int tempID=gameID;
         gameID++;
+        return tempID;
     };
+
+    public GameData getGame(Integer gameID)  {
+        return gameList.get(gameID);
+    }
 
     public HashMap<Integer, GameData> listAllGames() {
         return gameList;
@@ -48,7 +54,7 @@ public class MemoryDAO implements DAO {
     };
 
     public AuthData createAuth(UserData user) {
-        AuthData authData = new AuthData(UUID.randomUUID().toString(), user.username());
+        AuthData authData = new AuthData(user.username(), UUID.randomUUID().toString());
         authList.put(authData.authToken(), authData);
         return authData;
     };

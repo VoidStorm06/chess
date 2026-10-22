@@ -8,9 +8,12 @@ import io.javalin.*;
 import io.javalin.http.Context;
 import model.AuthData;
 import model.UserData;
-import service.LoginRequest;
-import service.LogoutRequest;
-import service.Services;
+import service.*;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 
 public class Server {
     private final Services services;
@@ -28,11 +31,11 @@ public class Server {
         //logs out
                 .delete("/session", this::logOutHandler)
         //lists the games currently available
-                .get("/game", context -> context.result("Works"))
+                .get("/game", this::showGamesHandler)
         //creates a game
-                .post("/game", context -> context.result("Works"))
+                .post("/game", this::createGameHandler)
         //joins a game
-                .put("/game", context -> context.result("Works"))
+                .put("/game", this::joinHandler)
         //exceptions
                 .exception(DataAccessException.class, this::exceptionHandler);
     }
@@ -58,7 +61,34 @@ public class Server {
     private void logOutHandler(Context context) throws DataAccessException {
         LogoutRequest logoutRequest = new LogoutRequest(context.header("authorization"));
         services.logOut(logoutRequest);
-        context.result(new Gson().toJson(new JsonObject()));
+        context.result(new Gson().toJson(new HashMap<>()));
+    }
+
+    private void createGameHandler(Context context) throws DataAccessException {
+        String authToken = context.header("authorization");
+        service.CreateGameInput input = new Gson().fromJson(context.body(), CreateGameInput.class);
+        CreateGameRequest createGameRequest = new CreateGameRequest(authToken, input.gameName());
+        CreateGameResponse gameCreated = services.createNewGame(createGameRequest);
+        context.result(new Gson().toJson(gameCreated));
+    }
+
+    private void showGamesHandler(Context context) throws DataAccessException {
+        String authToken = context.header("authorization");
+        Collection<ShowGamesResponse> response = services.viewAllGames(authToken);
+        Map<String, Object> gameList = new HashMap<>();
+        gameList.put("games", response);
+        context.result(new Gson().toJson(gameList));
+    }
+
+    private void joinHandler(Context context) throws DataAccessException {
+        String authToken = context.header("authorization");
+        JoinRequest input = new Gson().fromJson(context.body(), JoinRequest.class);
+        services.joinCurrGame(authToken, input);
+        context.result(new Gson().toJson(new HashMap<>()));
+    }
+
+    private void deleteHandler(Context context) throws DataAccessException {
+        services.deleteDatabases();
     }
 
     public int run(int desiredPort) {
