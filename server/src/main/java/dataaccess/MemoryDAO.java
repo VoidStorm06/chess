@@ -32,7 +32,7 @@ public class MemoryDAO implements DAO {
     };
 
     public int createNewGame (String gameName) {
-        var gameData = new GameData(gameID, "", "" ,
+        var gameData = new GameData(gameID, null, null,
                 gameName , new ChessGame());
         gameList.put(gameID, gameData);
         int tempID=gameID;

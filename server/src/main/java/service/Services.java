@@ -19,6 +19,9 @@ public class Services {
     }
 
     public AuthData registerUser(UserData user) throws DataAccessException {
+        if (user.password() == null || user.email()==null || user.username() == null) {
+            throw new DataAccessException("bad request");
+        }
         if (DAO.getUser(user) != null)  {
             throw new DataAccessException("Already taken");
         }
@@ -27,6 +30,9 @@ public class Services {
     }
 
     public AuthData logIn(LoginRequest loginRequest) throws DataAccessException {
+        if (loginRequest.password() == null || loginRequest.username() == null) {
+            throw new DataAccessException("bad request");
+        }
         UserData existingUser = DAO.getUser(new UserData(loginRequest.username(),
                 loginRequest.password(), ""));
         if (existingUser == null || !existingUser.password().equals(loginRequest.password()))  {
@@ -42,6 +48,9 @@ public class Services {
     }
 
     public CreateGameResponse createNewGame(CreateGameRequest createGameRequest) throws DataAccessException {
+        if (createGameRequest.gameName() == null) {
+            throw new DataAccessException("bad request");
+        }
         AuthData authToken = new AuthData("", createGameRequest.authToken());
         validAuthToken(authToken);
         int gameID = DAO.createNewGame(createGameRequest.gameName());
@@ -63,6 +72,9 @@ public class Services {
     }
 
     public void joinCurrGame(String authToken, JoinRequest request)  throws DataAccessException {
+        if (request.gameID() == null || request.playerColor() == null) {
+            throw new DataAccessException("bad request");
+        }
         AuthData authData = new AuthData("", authToken);
         validAuthToken(authData);
         GameData game = DAO.getGame(request.gameID());
@@ -70,12 +82,20 @@ public class Services {
             throw new DataAccessException("bad request");
         }
         GameData updateGame;
-        if (request.playerColor().equals("BLACK") && game.blackUsername().isEmpty()) {
-            updateGame = new GameData(request.gameID(), game.whiteUsername(),
-                    DAO.getAuth(authData).username(), game.gameName(), game.game());
-        } else if (request.playerColor().equals("WHITE") && game.whiteUsername().isEmpty()) {
-            updateGame = new GameData(request.gameID(), DAO.getAuth(authData).username(),
-                    game.blackUsername(), game.gameName(), game.game());
+        if (request.playerColor().equals("BLACK")) {
+            if (game.blackUsername() == null) {
+                updateGame = new GameData(request.gameID(), game.whiteUsername(),
+                        DAO.getAuth(authData).username(), game.gameName(), game.game());
+            } else {
+                throw new DataAccessException("Already taken");
+            }
+        } else if (request.playerColor().equals("WHITE")) {
+            if (game.whiteUsername() == null) {
+                updateGame = new GameData(request.gameID(), DAO.getAuth(authData).username(),
+                        game.blackUsername(), game.gameName(), game.game());
+            } else {
+                throw new DataAccessException("Already taken");
+            }
         } else {
             throw new DataAccessException("bad request");
         }

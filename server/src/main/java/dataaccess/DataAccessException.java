@@ -21,14 +21,11 @@ public class DataAccessException extends Exception{
     }
 
     public int messageToCode() {
-        if (getMessage().equals("bad request")) {
-            return 400;
-        } else if (getMessage().equals("unauthorized")) {
-            return 401;
-        } else if (getMessage().equals("Already taken")) {
-            return 403;
-        } else {
-            return 500;
-        }
+        return switch (getMessage()) {
+            case "bad request" -> 400;
+            case "unauthorized" -> 401;
+            case "Already taken" -> 403;
+            default -> 500;
+        };
     }
 }
