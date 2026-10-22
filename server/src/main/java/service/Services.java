@@ -70,10 +70,10 @@ public class Services {
             throw new DataAccessException("bad request");
         }
         GameData updateGame;
-        if (request.color().equals("BLACK") && game.blackUsername().isEmpty()) {
+        if (request.playerColor().equals("BLACK") && game.blackUsername().isEmpty()) {
             updateGame = new GameData(request.gameID(), game.whiteUsername(),
                     DAO.getAuth(authData).username(), game.gameName(), game.game());
-        } else if (request.color().equals("WHITE") && game.whiteUsername().isEmpty()) {
+        } else if (request.playerColor().equals("WHITE") && game.whiteUsername().isEmpty()) {
             updateGame = new GameData(request.gameID(), DAO.getAuth(authData).username(),
                     game.blackUsername(), game.gameName(), game.game());
         } else {
