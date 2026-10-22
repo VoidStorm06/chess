@@ -9,9 +9,9 @@ import java.util.Objects;
  * signature of the existing methods.
  */
 public class ChessMove {
-    private ChessPosition start;
-    private ChessPosition end;
-    private ChessPiece.PieceType promote;
+    private final ChessPosition start;
+    private final ChessPosition end;
+    private final ChessPiece.PieceType promote;
 
     @Override
     public boolean equals(Object o) {
@@ -19,7 +19,8 @@ public class ChessMove {
             return false;
         }
         ChessMove chessMove = (ChessMove) o;
-        return Objects.equals(start, chessMove.start) && Objects.equals(end, chessMove.end) && promote == chessMove.promote;
+        return Objects.equals(start, chessMove.start) &&
+                Objects.equals(end, chessMove.end) && promote == chessMove.promote;
     }
 
     @Override

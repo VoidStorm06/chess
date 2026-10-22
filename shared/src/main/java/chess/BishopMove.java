@@ -2,13 +2,12 @@ package chess;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Objects;
 
 public class BishopMove implements MovementRule {
 
-    private ChessBoard board;
-    private ChessPosition position;
-    private ChessPiece piece;
+    private final ChessBoard board;
+    private final ChessPosition position;
+    private final ChessPiece piece;
 
     public BishopMove(ChessBoard board, ChessPosition position, ChessPiece piece) {
         this.board=board;
@@ -20,7 +19,7 @@ public class BishopMove implements MovementRule {
 
     @Override
     public Collection<ChessMove> pieceMoves() {
-        Collection<ChessMove> moves = new ArrayList<ChessMove>();
+        Collection<ChessMove> moves = new ArrayList<>();
         int row = this.position.getRow();
         int col = this.position.getColumn();
         for (int i = 1; i <= 8; i++) {
