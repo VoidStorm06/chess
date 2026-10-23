@@ -24,11 +24,11 @@ public class KnightMove implements MovementRule {
                 if (j == 0 || i == 0) {
                     continue;
                 }
-                ChessMove moveCheck = collectMoves(row, i, col, j);
+                ChessMove moveCheck = moveCollection(row, i, col, j);
                 if(moveCheck != null) {
                     moves.add(moveCheck);
                 }
-                moveCheck = collectMoves(row, j, col, i);
+                moveCheck = moveCollection(row, j, col, i);
                 if(moveCheck != null) {
                     moves.add(moveCheck);
                 }
@@ -37,15 +37,26 @@ public class KnightMove implements MovementRule {
         return moves;
     }
 
-    private ChessMove collectMoves(int row, int rowChange, int col, int colChange) {
-        ChessPosition pos = new ChessPosition(row+rowChange, col+colChange);
-        if (pos.getRow() > 8 || pos.getRow() < 1 || pos.getColumn() > 8 || pos.getColumn() < 1) {
+    private ChessMove moveCollection(int row, int changeRow, int col, int changeCol) {
+        ChessPosition newPosition = new ChessPosition(row+changeRow, col+changeCol);
+        if (newPosition.getRow() > 8 || newPosition.getColumn() > 8 ||
+                newPosition.getRow() < 1 || newPosition.getColumn() < 1) {
             return null;
         }
-        if (board.getPiece(pos) == null || board.getPiece(pos).getTeamColor() != this.piece.getTeamColor()) {
-            return new ChessMove(position, pos, null);
+        if (board.getPiece(newPosition) == null || board.getPiece(newPosition).getTeamColor() != this.piece.getTeamColor()) {
+            return new ChessMove(position, newPosition, null);
         }
         return null;
     }
+//    private ChessMove collectMoves(int row, int rowChange, int col, int colChange) {
+//        ChessPosition pos = new ChessPosition(row+rowChange, col+colChange);
+//        if (pos.getRow() > 8 || pos.getRow() < 1 || pos.getColumn() > 8 || pos.getColumn() < 1) {
+//            return null;
+//        }
+//        if (board.getPiece(pos) == null || board.getPiece(pos).getTeamColor() != this.piece.getTeamColor()) {
+//            return new ChessMove(position, pos, null);
+//        }
+//        return null;
+//    }
 }
 
