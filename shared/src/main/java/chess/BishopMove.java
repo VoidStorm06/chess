@@ -15,8 +15,6 @@ public class BishopMove implements MovementRule {
         this.piece=piece;
     }
 
-
-
     @Override
     public Collection<ChessMove> pieceMoves() {
         Collection<ChessMove> moves = new ArrayList<>();

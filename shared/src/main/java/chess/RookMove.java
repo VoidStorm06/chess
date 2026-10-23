@@ -5,9 +5,9 @@ import java.util.Collection;
 import java.util.Objects;
 
 public class RookMove implements MovementRule{
-    private ChessBoard board;
-    private ChessPosition position;
-    private ChessPiece piece;
+    private final ChessBoard board;
+    private final ChessPosition position;
+    private final ChessPiece piece;
 
     public RookMove(ChessBoard board, ChessPosition position, ChessPiece piece) {
         this.board=board;
@@ -16,22 +16,8 @@ public class RookMove implements MovementRule{
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (o == null || getClass() != o.getClass()) {
-            return false;
-        }
-        RookMove rookMove = (RookMove) o;
-        return Objects.equals(board, rookMove.board) && Objects.equals(position, rookMove.position) && Objects.equals(piece, rookMove.piece);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(board, position, piece);
-    }
-
-    @Override
     public Collection<ChessMove> pieceMoves() {
-        Collection<ChessMove> moves = new ArrayList<ChessMove>();
+        Collection<ChessMove> moves = new ArrayList<>();
         int row = this.position.getRow();
         int col = this.position.getColumn();
         for (int i = 1; i <= 8; i++) {

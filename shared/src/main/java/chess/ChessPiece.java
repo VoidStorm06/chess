@@ -67,23 +67,17 @@ public class ChessPiece {
      */
     public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition myPosition) {
         if (this.getPieceType() == PieceType.KING) {
-            KingMove king = new KingMove(board, myPosition, this);
-            return king.pieceMoves();
+            return new KingMove(board, myPosition, this).pieceMoves();
         } else if (this.getPieceType()==PieceType.PAWN) {
-            PawnMove pawn = new PawnMove(board, myPosition, this);
-            return pawn.pieceMoves();
+            return new PawnMove(board, myPosition, this).pieceMoves();
         } else if (this.getPieceType()==PieceType.QUEEN) {
-            QueenMove queen = new QueenMove(board, myPosition, this);
-            return queen.pieceMoves();
+            return new QueenMove(board, myPosition, this).pieceMoves();
         } else if (this.getPieceType()==PieceType.ROOK) {
-            RookMove rook = new  RookMove(board, myPosition, this);
-            return rook.pieceMoves();
+            return new  RookMove(board, myPosition, this).pieceMoves();
         } else if (this.getPieceType()==PieceType.BISHOP) {
-            BishopMove bishop = new BishopMove(board, myPosition, this);
-            return bishop.pieceMoves();
+            return new BishopMove(board, myPosition, this).pieceMoves();
         } else {
-            KnightMove knight = new KnightMove(board, myPosition, this);
-                return knight.pieceMoves();
+            return new KnightMove(board, myPosition, this).pieceMoves();
         }
     }
 }
