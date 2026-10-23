@@ -48,15 +48,5 @@ public class KnightMove implements MovementRule {
         }
         return null;
     }
-//    private ChessMove collectMoves(int row, int rowChange, int col, int colChange) {
-//        ChessPosition pos = new ChessPosition(row+rowChange, col+colChange);
-//        if (pos.getRow() > 8 || pos.getRow() < 1 || pos.getColumn() > 8 || pos.getColumn() < 1) {
-//            return null;
-//        }
-//        if (board.getPiece(pos) == null || board.getPiece(pos).getTeamColor() != this.piece.getTeamColor()) {
-//            return new ChessMove(position, pos, null);
-//        }
-//        return null;
-//    }
 }
 
