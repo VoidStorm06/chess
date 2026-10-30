@@ -1,5 +1,6 @@
 package service;
 
+import dataaccess.DAO;
 import dataaccess.DataAccessException;
 import dataaccess.MemoryDAO;
 import model.AuthData;
@@ -11,9 +12,9 @@ import java.util.Collection;
 
 public class Services {
 
-    final private MemoryDAO dataAccess;
+    final private DAO dataAccess;
 
-    public Services(MemoryDAO dataAccess) {
+    public Services(DAO dataAccess) {
         this.dataAccess = dataAccess;
     }
 

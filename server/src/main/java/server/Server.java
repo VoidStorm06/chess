@@ -1,6 +1,7 @@
 package server;
 
 import com.google.gson.Gson;
+import dataaccess.DAO;
 import dataaccess.DataAccessException;
 import dataaccess.MemoryDAO;
 import io.javalin.*;
