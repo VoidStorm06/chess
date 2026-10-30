@@ -4,13 +4,35 @@ import model.AuthData;
 import model.GameData;
 import model.UserData;
 
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
 import java.util.HashMap;
 
 public class SQLDAO implements DAO {
 
+    public SQLDAO() throws DataAccessException {
+        configureDatabases();
+    }
+
     @Override
     public void clearAllDatabases() throws DataAccessException {
-
+        try (Connection conn = DatabaseManager.getConnection()) {
+            var userStatement = "TRUNCATE user";
+            try (PreparedStatement ps = conn.prepareStatement(userStatement)) {
+                ps.executeQuery();
+            }
+            var gameStatement = "TRUNCATE game";
+            try (PreparedStatement ps = conn.prepareStatement(gameStatement)) {
+                ps.executeQuery();
+            }
+            var authStatement = "TRUNCATE auth";
+            try (PreparedStatement ps = conn.prepareStatement(authStatement)) {
+                ps.executeQuery();
+            }
+        } catch (SQLException ex) {
+            throw new DataAccessException("Cannot update database");
+        }
     }
 
     @Override
@@ -56,5 +78,10 @@ public class SQLDAO implements DAO {
     @Override
     public void deleteAuth(AuthData authData) throws DataAccessException {
 
+    }
+
+    public void configureDatabases() throws DataAccessException {
+        DatabaseManager.createDatabase();
+        //create tables within database
     }
 }
