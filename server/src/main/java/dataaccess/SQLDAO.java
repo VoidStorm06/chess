@@ -1,5 +1,8 @@
 package dataaccess;
 
+import chess.ChessGame;
+import chess.ChessPosition;
+import com.google.gson.Gson;
 import model.AuthData;
 import model.GameData;
 import model.UserData;
@@ -75,12 +78,47 @@ public class SQLDAO implements DAO {
 
     @Override
     public int createNewGame(String gameName) throws DataAccessException {
-        return 0;
+        int returnValue = 0;
+        try (Connection conn = DatabaseManager.getConnection()) {
+            var statement = "INSERT into game (whiteUsername, blackUsername, gameName, game) VALUES (?, ?, ?, ?)";
+            try (PreparedStatement ps = conn.prepareStatement(statement, PreparedStatement.RETURN_GENERATED_KEYS)) {
+                ps.setString(1, "");
+                ps.setString(2, "");
+                ps.setString(3, gameName);
+                ps.setString(4, new Gson().toJson(new ChessGame()));
+                ps.executeUpdate();
+                var result = ps.getGeneratedKeys();
+                if (result.next()) {
+                    returnValue = result.getInt(1);
+                }
+            }
+        } catch (SQLException ex) {
+            throw new DataAccessException("Cannot access database", ex);
+        }
+        return returnValue;
     }
 
     @Override
     public HashMap<Integer, GameData> listAllGames() throws DataAccessException {
-        return null;
+        HashMap<Integer, GameData> gameList = new HashMap<>();
+        try (Connection conn = DatabaseManager.getConnection()) {
+            var statement = "SELECT * FROM game";
+            try (PreparedStatement ps = conn.prepareStatement(statement)) {
+                try (var response = ps.executeQuery()) {
+                    while (response.next()) {
+                        GameData gameData = new GameData(response.getInt("gameID"),
+                                response.getString("whiteUsername"),
+                                response.getString("blackUsername"),
+                                response.getString("gameName"),
+                                deserializeGame(response.getString("game")));
+                        gameList.put(response.getInt("gameID"), gameData);
+                    }
+                }
+            }
+        } catch (SQLException ex) {
+            throw new DataAccessException("Cannot access database");
+        }
+        return gameList;
     }
 
     @Override
@@ -106,6 +144,10 @@ public class SQLDAO implements DAO {
     @Override
     public void deleteAuth(AuthData authData) throws DataAccessException {
 
+    }
+
+    private ChessGame deserializeGame(String game) {
+        return new Gson().fromJson(game, ChessGame.class);
     }
 
     private final String[] tableStatements = {
