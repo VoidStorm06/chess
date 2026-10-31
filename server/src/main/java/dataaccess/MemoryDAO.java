@@ -26,6 +26,9 @@ public class MemoryDAO implements DAO {
     }
 
     public UserData getUser(UserData user) {
+        if (userList.get(user.username()).password()!= user.password()) {
+            return null;
+        }
         return userList.get(user.username());
     }
 

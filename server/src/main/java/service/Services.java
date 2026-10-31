@@ -35,7 +35,7 @@ public class Services {
         }
         UserData existingUser = dataAccess.getUser(new UserData(loginRequest.username(),
                 loginRequest.password(), ""));
-        if (existingUser == null || !existingUser.password().equals(loginRequest.password()))  {
+        if (existingUser == null)  {
             throw new DataAccessException("unauthorized");
         }
         return dataAccess.createAuth(existingUser);

@@ -3,6 +3,7 @@ package dataaccess;
 import model.AuthData;
 import model.GameData;
 import model.UserData;
+import org.mindrot.jbcrypt.BCrypt;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -37,7 +38,18 @@ public class SQLDAO implements DAO {
 
     @Override
     public void createUser(UserData user) throws DataAccessException {
-
+        try (Connection conn = DatabaseManager.getConnection()) {
+            var statement = "INSERT into 'user' ('username', 'password', 'email') VALUES (?, ?, ?)";
+            try (PreparedStatement ps = conn.prepareStatement(statement)) {
+                ps.setString(1, user.username());
+                String encryptedPassword = BCrypt.hashpw(user.password(), BCrypt.gensalt());
+                ps.setString(2, encryptedPassword);
+                ps.setString(3, user.email());
+                ps.executeUpdate();
+            }
+        } catch (SQLException ex) {
+            throw new DataAccessException("Cannot update database");
+        }
     }
 
     @Override
