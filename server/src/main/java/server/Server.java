@@ -1,10 +1,8 @@
 package server;
 
 import com.google.gson.Gson;
-import dataaccess.DAO;
 import dataaccess.DataAccessException;
-import dataaccess.MemoryDAO;
-import dataaccess.SQLDAO;
+import dataaccess.sql.SQLDAO;
 import io.javalin.*;
 import io.javalin.http.Context;
 import model.AuthData;
