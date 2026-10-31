@@ -6,6 +6,7 @@ import model.GameData;
 import model.UserData;
 
 import java.util.HashMap;
+import java.util.Objects;
 import java.util.UUID;
 
 public class MemoryDAO implements DAO {
@@ -26,7 +27,7 @@ public class MemoryDAO implements DAO {
     }
 
     public UserData getUser(UserData user) {
-        if (userList.get(user.username()).password()!= user.password()) {
+        if (!Objects.equals(userList.get(user.username()).password(), user.password())) {
             return null;
         }
         return userList.get(user.username());
