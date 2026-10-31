@@ -4,6 +4,7 @@ import com.google.gson.Gson;
 import dataaccess.DAO;
 import dataaccess.DataAccessException;
 import dataaccess.MemoryDAO;
+import dataaccess.SQLDAO;
 import io.javalin.*;
 import io.javalin.http.Context;
 import model.AuthData;
@@ -19,7 +20,8 @@ public class Server {
     private final Javalin javalin;
 
     public Server() {
-        services = new Services(new MemoryDAO());
+        services = new Services(new SQLDAO());
+        //services = new Services(new MemoryDAO());
         javalin = Javalin.create(config -> config.staticFiles.add("web"))
                 //deletes database
                 .delete("/db", this::deleteHandler)

@@ -1,5 +1,6 @@
 package service;
 
+import dataaccess.DAO;
 import dataaccess.DataAccessException;
 import dataaccess.MemoryDAO;
 import model.UserData;
@@ -12,7 +13,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class ServicesTest {
     private UserData tempUser = new UserData("bob", "bob", "bob");
-    private final MemoryDAO tempDAO = new MemoryDAO();
+    private final DAO tempDAO = new MemoryDAO();
     private final Services tempServices = new Services(tempDAO);
 
     @Test

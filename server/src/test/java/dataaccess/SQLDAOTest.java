@@ -21,6 +21,7 @@ class SQLDAOTest {
     @Test
     void createUser() throws DataAccessException {
         DAO sqlDAO = new SQLDAO();
+        sqlDAO.clearAllDatabases();
         UserData testUser = new UserData("bob", "bob", "bob.gmail.com");
         sqlDAO.createUser(testUser);
         try (Connection conn = DatabaseManager.getConnection()) {
@@ -37,19 +38,18 @@ class SQLDAOTest {
         } catch (SQLException ex) {
            throw new DataAccessException("Cannot access database", ex);
         }
-        sqlDAO.clearAllDatabases();
     }
 
     @Test
     void getUser() throws DataAccessException {
         DAO sqlDAO = new SQLDAO();
+        sqlDAO.clearAllDatabases();
         UserData testUser = new UserData("bill", "bill", "bill.gmail.com");
         sqlDAO.createUser(testUser);
         var getUser = sqlDAO.getUser(testUser);
         assertEquals(testUser.username(), getUser.username());
         assertEquals(testUser.email(), getUser.email());
         assertTrue(BCrypt.checkpw(testUser.password(), getUser.password()));
-        sqlDAO.clearAllDatabases();
     }
 
     @Test
@@ -85,6 +85,7 @@ class SQLDAOTest {
     @Test
     void createNewGame() throws DataAccessException {
         DAO sqlDAO = new SQLDAO();
+        sqlDAO.clearAllDatabases();
         int gameId = sqlDAO.createNewGame("First Game");
         assertEquals(1, gameId);
         gameId = sqlDAO.createNewGame("Second Game");
@@ -92,36 +93,36 @@ class SQLDAOTest {
         sqlDAO.clearAllDatabases();
         gameId = sqlDAO.createNewGame("New First Game");
         assertEquals(1, gameId);
-        sqlDAO.clearAllDatabases();
     }
 
     @Test
     void listAllGames() throws DataAccessException {
         DAO sqlDAO = new SQLDAO();
+        sqlDAO.clearAllDatabases();
         sqlDAO.createNewGame("First Game");
         HashMap<Integer, GameData> gameList = new HashMap<>();
-        gameList.put(1, new GameData(1, "",
-                "", "First Game", new ChessGame()));
+        gameList.put(1, new GameData(1, null,
+                null, "First Game", new ChessGame()));
         HashMap<Integer, GameData> returnedGameList = sqlDAO.listAllGames();
         assertEquals(gameList, returnedGameList);
-        sqlDAO.clearAllDatabases();
     }
 
     @Test
     void updateGame() throws DataAccessException {
         DAO sqlDAO = new SQLDAO();
+        sqlDAO.clearAllDatabases();
         int gameId = sqlDAO.createNewGame("First Game");
         GameData gameData = sqlDAO.getGame(gameId);
         assertEquals("First Game", gameData.gameName());
-        assertEquals("", gameData.whiteUsername());
-        assertEquals("", gameData.blackUsername());
+        assertNull(gameData.whiteUsername());
+        assertNull(gameData.blackUsername());
         assertEquals(new ChessGame(), gameData.game());
         sqlDAO.updateGame(new GameData(1,
-                "Bob", "", "New First Game", new ChessGame()));
+                "Bob", null, "New First Game", new ChessGame()));
         gameData = sqlDAO.getGame(gameId);
         assertEquals("New First Game", gameData.gameName());
         assertEquals("Bob", gameData.whiteUsername());
-        assertEquals("", gameData.blackUsername());
+        assertNull(gameData.blackUsername());
         assertEquals(new ChessGame(), gameData.game());
         ChessGame newGame = new ChessGame();
         ChessGame testNewGame = new ChessGame();
@@ -146,38 +147,45 @@ class SQLDAOTest {
     @Test
     void getGame() throws DataAccessException {
         DAO sqlDAO = new SQLDAO();
+        sqlDAO.clearAllDatabases();
         int gameId = sqlDAO.createNewGame("First Game");
         var gameData = sqlDAO.getGame(gameId);
         assertEquals(1, gameData.gameID());
-        assertEquals("", gameData.whiteUsername());
-        assertEquals("", gameData.blackUsername());
+        assertNull(gameData.whiteUsername());
+        assertNull(gameData.blackUsername());
         assertEquals("First Game", gameData.gameName());
         assertEquals(new ChessGame(), gameData.game());
-        sqlDAO.clearAllDatabases();
     }
 
     @Test
     void createAuth() throws DataAccessException{
         DAO sqlDAO = new SQLDAO();
+        sqlDAO.clearAllDatabases();
         UserData userData = new UserData("Bob", "Bob", "Bob");
         var authData = sqlDAO.createAuth(userData);
         var testAuthData = sqlDAO.getAuth(authData);
         assertEquals(authData, testAuthData);
-        sqlDAO.clearAllDatabases();
     }
 
     @Test
     void getAuth() throws DataAccessException{
         DAO sqlDAO = new SQLDAO();
+        sqlDAO.clearAllDatabases();
         UserData userData = new UserData("Bob", "Bob", "Bob");
         var authData = sqlDAO.createAuth(userData);
         AuthData newAuthData = new AuthData("", authData.authToken());
         var testAuthData = sqlDAO.getAuth(newAuthData);
         assertEquals(authData, testAuthData);
-        sqlDAO.clearAllDatabases();
     }
 
     @Test
-    void deleteAuth() {
+    void deleteAuth() throws DataAccessException {
+        DAO sqlDAO = new SQLDAO();
+        sqlDAO.clearAllDatabases();
+        UserData userData = new UserData("Bob", "Bob", "Bob");
+        var authData = sqlDAO.createAuth(userData);
+        assertNotNull(sqlDAO.getAuth(authData));
+        sqlDAO.deleteAuth(authData);
+        assertNull(sqlDAO.getAuth(authData));
     }
 }

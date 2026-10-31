@@ -87,8 +87,8 @@ public class SQLDAO implements DAO {
         try (Connection conn = DatabaseManager.getConnection()) {
             var statement = "INSERT into game (whiteUsername, blackUsername, gameName, game) VALUES (?, ?, ?, ?)";
             try (PreparedStatement ps = conn.prepareStatement(statement, PreparedStatement.RETURN_GENERATED_KEYS)) {
-                ps.setString(1, "");
-                ps.setString(2, "");
+                ps.setString(1, null);
+                ps.setString(2, null);
                 ps.setString(3, gameName);
                 ps.setString(4, new Gson().toJson(new ChessGame()));
                 ps.executeUpdate();
@@ -177,7 +177,7 @@ public class SQLDAO implements DAO {
                 ps.executeUpdate();
             }
         } catch (SQLException ex) {
-            throw new DataAccessException("Cannot access database");
+            throw new DataAccessException("Cannot access database", ex);
         }
         return new AuthData(user.username(), authToken);
     }
@@ -203,7 +203,15 @@ public class SQLDAO implements DAO {
 
     @Override
     public void deleteAuth(AuthData authData) throws DataAccessException {
-
+        try(Connection conn = DatabaseManager.getConnection()) {
+            var statement = "DELETE FROM auth WHERE authToken=?";
+            try(PreparedStatement ps = conn.prepareStatement(statement)) {
+                ps.setString(1, authData.authToken());
+                ps.executeUpdate();
+            }
+        } catch (SQLException ex) {
+            throw new DataAccessException("Cannot access database");
+        }
     }
 
     private ChessGame deserializeGame(String game) {
@@ -225,8 +233,8 @@ public class SQLDAO implements DAO {
         """, """
         CREATE TABLE IF NOT EXISTS game (
         gameID int NOT NULL AUTO_INCREMENT, 
-        whiteUsername varchar(255) NOT NULL, 
-        blackUsername varchar(255) NOT NULL, 
+        whiteUsername varchar(255), 
+        blackUsername varchar(255), 
         gameName varchar(255) NOT NULL, 
         game TEXT DEFAULT NULL, 
         PRIMARY KEY (gameID))
