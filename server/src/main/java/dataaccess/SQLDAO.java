@@ -12,11 +12,16 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.HashMap;
+import java.util.UUID;
 
 public class SQLDAO implements DAO {
 
-    public SQLDAO() throws DataAccessException {
-        configureDatabases();
+    public SQLDAO()  {
+        try {
+            configureDatabases();
+        } catch (DataAccessException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override
@@ -58,7 +63,7 @@ public class SQLDAO implements DAO {
     @Override
     public UserData getUser(UserData user) throws DataAccessException {
         try (Connection conn = DatabaseManager.getConnection()) {
-            var statement = "SELECT username, password, email FROM user WHERE username=?";
+            var statement = "SELECT * FROM user WHERE username=?";
             try (PreparedStatement ps = conn.prepareStatement(statement)) {
                 ps.setString(1, user.username());
                 try (var response = ps.executeQuery()) {
@@ -123,21 +128,76 @@ public class SQLDAO implements DAO {
 
     @Override
     public void updateGame(GameData gameData) throws DataAccessException {
-
+        try (Connection conn = DatabaseManager.getConnection()) {
+            var statement = "UPDATE game Set gameID=?, whiteUsername=?, blackUsername=?, " +
+                    "gameName=?, game=? WHERE gameID=?";
+            try (PreparedStatement ps = conn.prepareStatement(statement)) {
+                ps.setInt(1, gameData.gameID());
+                ps.setString(2, gameData.whiteUsername());
+                ps.setString(3, gameData.blackUsername());
+                ps.setString(4, gameData.gameName());
+                ps.setString(5, new Gson().toJson(gameData.game()));
+                ps.setInt(6, gameData.gameID());
+                ps.executeUpdate();
+            }
+        } catch (SQLException ex) {
+            throw new DataAccessException("Cannot access database");
+        }
     }
 
     @Override
     public GameData getGame(Integer gameID) throws DataAccessException {
+        try (Connection conn = DatabaseManager.getConnection()) {
+            var statement = "SELECT * FROM game WHERE gameID=?";
+            try(PreparedStatement ps = conn.prepareStatement(statement)) {
+                ps.setInt(1, gameID);
+                try(var response = ps.executeQuery()) {
+                    if(response.next()) {
+                        return new GameData(gameID, response.getString("whiteUsername"),
+                                response.getString("blackUsername"),
+                                response.getString("gameName"),
+                                deserializeGame(response.getString("game")));
+                    }
+                }
+            }
+        } catch (SQLException ex) {
+            throw new DataAccessException("Cannot access database");
+        }
         return null;
     }
 
     @Override
     public AuthData createAuth(UserData user) throws DataAccessException {
-        return null;
+        String authToken = UUID.randomUUID().toString();
+        try (Connection conn = DatabaseManager.getConnection()) {
+            var statement = "INSERT into auth (username, authToken) VALUES (?, ?)";
+            try(PreparedStatement ps = conn.prepareStatement(statement)) {
+                ps.setString(1, user.username());
+                ps.setString(2, authToken);
+                ps.executeUpdate();
+            }
+        } catch (SQLException ex) {
+            throw new DataAccessException("Cannot access database");
+        }
+        return new AuthData(user.username(), authToken);
     }
 
     @Override
     public AuthData getAuth(AuthData authData) throws DataAccessException {
+        try (Connection conn = DatabaseManager.getConnection()) {
+            var statement = "SELECT * FROM auth WHERE authToken=?";
+            try (PreparedStatement ps = conn.prepareStatement(statement)) {
+                ps.setString(1, authData.authToken());
+                try(var response = ps.executeQuery()) {
+                    if(response.next()) {
+                        return new AuthData(response.getString("username"),
+                                response.getString("authToken"));
+                    }
+                }
+            }
+        } catch (SQLException ex) {
+            throw new DataAccessException("Cannot access database");
+        }
         return null;
     }
 
@@ -161,7 +221,7 @@ public class SQLDAO implements DAO {
         CREATE TABLE IF NOT EXISTS auth (
         username varchar(255) NOT NULL, 
         authToken varchar(255) NOT NULL, 
-        PRIMARY KEY (username))
+        PRIMARY KEY (authToken))
         """, """
         CREATE TABLE IF NOT EXISTS game (
         gameID int NOT NULL AUTO_INCREMENT, 
