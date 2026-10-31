@@ -67,11 +67,9 @@ public class SQLDAO implements DAO {
             try (PreparedStatement ps = conn.prepareStatement(statement)) {
                 ps.setString(1, user.username());
                 try (var response = ps.executeQuery()) {
-                    while(response.next()) {
-                        if (BCrypt.checkpw(user.password(), response.getString("password"))) {
-                            return new UserData(response.getString("username"),
-                                    response.getString("password"), response.getString("email"));
-                        }
+                    if(response.next() && BCrypt.checkpw(user.password(), response.getString("password"))) {
+                        return new UserData(response.getString("username"),
+                                response.getString("password"), response.getString("email"));
                     }
                 }
             }
