@@ -20,15 +20,15 @@ public class SQLDAO implements DAO {
         try (Connection conn = DatabaseManager.getConnection()) {
             var userStatement = "TRUNCATE user";
             try (PreparedStatement ps = conn.prepareStatement(userStatement)) {
-                ps.executeQuery();
+                ps.executeUpdate();
             }
             var gameStatement = "TRUNCATE game";
             try (PreparedStatement ps = conn.prepareStatement(gameStatement)) {
-                ps.executeQuery();
+                ps.executeUpdate();
             }
             var authStatement = "TRUNCATE auth";
             try (PreparedStatement ps = conn.prepareStatement(authStatement)) {
-                ps.executeQuery();
+                ps.executeUpdate();
             }
         } catch (SQLException ex) {
             throw new DataAccessException("Cannot update database");
@@ -80,8 +80,41 @@ public class SQLDAO implements DAO {
 
     }
 
+    private final String[] tableStatements = {
+        """
+        CREATE TABLE IF NOT EXISTS user (
+        'username' varchar(255) NOT NULL, 
+        'password' varchar(255) NOT NULL, 
+        'email' varchar(255) NOT NULL, 
+        PRIMARY KEY ('username'))
+        """, """
+        CREATE TABLE IF NOT EXISTS auth (
+        'username' varchar(255) NOT NULL, 
+        'authToken' varchar(255) NOT NULL, 
+        PRIMARY KEY ('username'))
+        """, """
+        CREATE TABLE IF NOT EXISTS game (
+        'gameID' int NOT NULL AUTO_INCREMENT, 
+        'whiteUsername' varchar(255) NOT NULL, 
+        'blackUsername' varchar(255) NOT NULL, 
+        'gameName' varchar(255) NOT NULL, 
+        'game' JSON DEFAULT NULL, 
+        PRIMARY KEY ('gameID')) 
+        """
+    };
+
     public void configureDatabases() throws DataAccessException {
         DatabaseManager.createDatabase();
         //create tables within database
+        try (Connection conn = DatabaseManager.getConnection()) {
+            for (var statement : tableStatements) {
+                try (PreparedStatement ps = conn.prepareStatement(statement)) {
+                    ps.executeQuery();
+                }
+            }
+        } catch (SQLException ex) {
+            throw new DataAccessException("Cannot configure database");
+        }
+
     }
 }
