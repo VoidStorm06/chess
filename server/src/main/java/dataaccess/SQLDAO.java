@@ -19,16 +19,16 @@ public class SQLDAO implements DAO {
     @Override
     public void clearAllDatabases() throws DataAccessException {
         try (Connection conn = DatabaseManager.getConnection()) {
-            var userStatement = "TRUNCATE user";
-            try (PreparedStatement ps = conn.prepareStatement(userStatement)) {
-                ps.executeUpdate();
-            }
-            var gameStatement = "TRUNCATE game";
+            var gameStatement = "TRUNCATE TABLE game";
             try (PreparedStatement ps = conn.prepareStatement(gameStatement)) {
                 ps.executeUpdate();
             }
-            var authStatement = "TRUNCATE auth";
+            var authStatement = "TRUNCATE TABLE auth";
             try (PreparedStatement ps = conn.prepareStatement(authStatement)) {
+                ps.executeUpdate();
+            }
+            var userStatement = "TRUNCATE TABLE user";
+            try (PreparedStatement ps = conn.prepareStatement(userStatement)) {
                 ps.executeUpdate();
             }
         } catch (SQLException ex) {
@@ -39,7 +39,7 @@ public class SQLDAO implements DAO {
     @Override
     public void createUser(UserData user) throws DataAccessException {
         try (Connection conn = DatabaseManager.getConnection()) {
-            var statement = "INSERT into 'user' ('username', 'password', 'email') VALUES (?, ?, ?)";
+            var statement = "INSERT into user (username, password, email) VALUES (?, ?, ?)";
             try (PreparedStatement ps = conn.prepareStatement(statement)) {
                 ps.setString(1, user.username());
                 String encryptedPassword = BCrypt.hashpw(user.password(), BCrypt.gensalt());
@@ -48,12 +48,28 @@ public class SQLDAO implements DAO {
                 ps.executeUpdate();
             }
         } catch (SQLException ex) {
-            throw new DataAccessException("Cannot update database");
+            throw new DataAccessException("Cannot update database", ex);
         }
     }
 
     @Override
     public UserData getUser(UserData user) throws DataAccessException {
+        try (Connection conn = DatabaseManager.getConnection()) {
+            var statement = "SELECT username, password, email FROM user WHERE username=?";
+            try (PreparedStatement ps = conn.prepareStatement(statement)) {
+                ps.setString(1, user.username());
+                try (var response = ps.executeQuery()) {
+                    while(response.next()) {
+                        if (BCrypt.checkpw(user.password(), response.getString("password"))) {
+                            return new UserData(response.getString("username"),
+                                    response.getString("password"), response.getString("email"));
+                        }
+                    }
+                }
+            }
+        } catch (SQLException ex) {
+            throw new DataAccessException("Cannot access database");
+        }
         return null;
     }
 
@@ -95,23 +111,23 @@ public class SQLDAO implements DAO {
     private final String[] tableStatements = {
         """
         CREATE TABLE IF NOT EXISTS user (
-        'username' varchar(255) NOT NULL, 
-        'password' varchar(255) NOT NULL, 
-        'email' varchar(255) NOT NULL, 
-        PRIMARY KEY ('username'))
+        username varchar(255) NOT NULL, 
+        password varchar(255) NOT NULL, 
+        email varchar(255) NOT NULL, 
+        PRIMARY KEY (username))
         """, """
         CREATE TABLE IF NOT EXISTS auth (
-        'username' varchar(255) NOT NULL, 
-        'authToken' varchar(255) NOT NULL, 
-        PRIMARY KEY ('username'))
+        username varchar(255) NOT NULL, 
+        authToken varchar(255) NOT NULL, 
+        PRIMARY KEY (username))
         """, """
         CREATE TABLE IF NOT EXISTS game (
-        'gameID' int NOT NULL AUTO_INCREMENT, 
-        'whiteUsername' varchar(255) NOT NULL, 
-        'blackUsername' varchar(255) NOT NULL, 
-        'gameName' varchar(255) NOT NULL, 
-        'game' JSON DEFAULT NULL, 
-        PRIMARY KEY ('gameID')) 
+        gameID int NOT NULL AUTO_INCREMENT, 
+        whiteUsername varchar(255) NOT NULL, 
+        blackUsername varchar(255) NOT NULL, 
+        gameName varchar(255) NOT NULL, 
+        game TEXT DEFAULT NULL, 
+        PRIMARY KEY (gameID))
         """
     };
 
@@ -121,7 +137,7 @@ public class SQLDAO implements DAO {
         try (Connection conn = DatabaseManager.getConnection()) {
             for (var statement : tableStatements) {
                 try (PreparedStatement ps = conn.prepareStatement(statement)) {
-                    ps.executeQuery();
+                    ps.executeUpdate();
                 }
             }
         } catch (SQLException ex) {
