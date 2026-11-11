@@ -1,6 +1,10 @@
 package client;
 
+//import chess.ChessGame;
+
 import java.util.Scanner;
+
+import static ui.EscapeSequences.*;
 
 public class ClientLogic {
     //private final String user;
@@ -16,13 +20,21 @@ public class ClientLogic {
         System.out.println("Welcome to Chess! Type 'help' to get started");
         Scanner scanner = new Scanner(System.in);
         var result = "";
+        printGame();
         while (!result.equals("quit")) {
+            String user;
+            if (loggedIn) {
+                user = "Logged_In";
+            } else {
+                user = "Logged_Out";
+            }
+            System.out.print( user+ " >>> ");
             String line = scanner.nextLine();
             try {
                 result = evaluate(line);
                 System.out.println(result);
             } catch (Exception ex) {
-                System.out.print(ex.getMessage());
+                System.out.println(ex.getMessage());
             }
         }
     }
@@ -36,7 +48,7 @@ public class ClientLogic {
                     case "quit" -> "quit";
                     case "login" -> login(inputs);
                     case "register" -> register(inputs);
-                    default -> throw new SecurityException("Not signed in, cannot perform action");
+                    default -> throw new SecurityException("Cannot perform action");
                 };
             }
             return switch (inputs[0]) {
@@ -47,7 +59,7 @@ public class ClientLogic {
                 case "list" -> list();
                 case "play" -> play(inputs);
                 case "observe" -> observe(inputs);
-                default -> throw new SecurityException("Currently signed in, cannot perform action");
+                default -> throw new SecurityException("Cannot perform action");
             };
         } catch (SecurityException ex) {
             return ex.getMessage();
@@ -75,20 +87,46 @@ public class ClientLogic {
     }
 
     private String login(String[] inputs) {
-        loggedIn = true;
-        return "login";
+        try {
+            if (inputs.length != 3) {
+                throw new IllegalArgumentException("Error: incorrect number of arguments");
+            }
+            loggedIn = true;
+            return "logged in as " + inputs[1];
+        } catch (IllegalArgumentException ex) {
+            return ex.getMessage();
+        }
     }
 
     private String register(String[] inputs) {
-        loggedIn = false;
-        return "register";
+        try {
+            if (inputs.length != 4) {
+                throw new IllegalArgumentException("Error: incorrect number of arguments");
+            }
+            loggedIn = true;
+            return "register";
+        } catch (IllegalArgumentException ex) {
+            return ex.getMessage();
+        }
     }
 
     private String logout() {
-        return "logout";
+        try {
+            loggedIn = false;
+            return "logout";
+        } catch (Exception ex) {
+            return "Error: failed to log out";
+        }
     }
 
     private String create(String[] inputs) {
+        try {
+            if (inputs.length != 2) {
+                throw new IllegalArgumentException("Error: incorrect number of arguments");
+            }
+        } catch (IllegalArgumentException ex) {
+            return ex.getMessage();
+        }
         return "create";
     }
 
@@ -97,10 +135,58 @@ public class ClientLogic {
     }
 
     private String play(String[] inputs) {
-        return "play";
+        try {
+            if (inputs.length != 3) {
+                throw new IllegalArgumentException("Error: incorrect number of arguments");
+            }
+            if (!inputs[2].equals("white") && !inputs[2].equals("black")) {
+                throw new IllegalArgumentException("Error: must be join game as WHITE or BLACK player");
+            }
+            return "play";
+        } catch (Exception ex) {
+            return ex.getMessage();
+        }
     }
 
     private String observe(String[] inputs) {
-        return "observe";
+        try {
+            if (inputs.length != 2) {
+                throw new IllegalArgumentException("Error: incorrect number of arguments");
+            }
+            return "observe";
+        } catch (Exception ex) {
+            return ex.getMessage();
+        }
+    }
+
+    private void printGame() {
+        System.out.println("   A  B  C  D  E  F  G  H  ");
+        for (int i = 0; i < 8; i++) {
+            System.out.print(String.valueOf(i+1) + " ");
+            for (int j = 0; j < 8; j++) {
+                if (i%2 == 0) {
+                    if (j%2 == 0) {
+                        System.out.print(SET_BG_COLOR_DARK_GREY);
+                        System.out.print(SET_TEXT_COLOR_WHITE);
+                    } else {
+                        System.out.print(SET_TEXT_COLOR_DARK_GREY);
+                        System.out.print(SET_BG_COLOR_WHITE);
+                    }
+                } else {
+                    if (j%2 == 0) {
+                        System.out.print(SET_TEXT_COLOR_DARK_GREY);
+                        System.out.print(SET_BG_COLOR_WHITE);
+                    } else {
+                        System.out.print(SET_BG_COLOR_DARK_GREY);
+                        System.out.print(SET_TEXT_COLOR_WHITE);
+                    }
+                }
+                System.out.print(" P ");
+            }
+            System.out.print(RESET_TEXT_COLOR);
+            System.out.print(RESET_BG_COLOR);
+            System.out.println(" " + String.valueOf(i+1));
+        }
+        System.out.println("   A  B  C  D  E  F  G  H  ");
     }
 }
