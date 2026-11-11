@@ -1,16 +1,20 @@
 package client;
 
+import javax.swing.plaf.synth.SynthDesktopIconUI;
+import java.util.Scanner;
+
 public class ClientMain {
     public static void main(String[] args) {
+        String url = "http://localhost:8080";
+        if (args.length == 1) {
+            url = args[0];
+        }
+        try {
+            new ClientLogic(url).run();
+        } catch (Throwable ex) {
+            System.out.printf("Unable to start server");
+        }
 
-
-        System.out.print("\u001b[H\u001b[2J");
-        System.out.flush();
-        System.out.println("The screen has been cleared!");
-
-
-//        var piece = new ChessPiece(ChessGame.TeamColor.WHITE, ChessPiece.PieceType.PAWN);
-//        System.out.println("♕ 240 Chess Client: " + piece);
 
     }
 }
