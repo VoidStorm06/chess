@@ -53,7 +53,7 @@ public class ServerFacadeTests {
     }
 
     @Test
-    public void LoginTest() throws Exception {
+    public void loginTest() throws Exception {
         UserData user = new UserData("bo", "bo", "bob");
         var temp = serverFacade.registerUser(user);
         serverFacade.logoutUser(new LogoutRequest(temp.authToken()));
@@ -62,7 +62,7 @@ public class ServerFacadeTests {
     }
 
     @Test
-    public void CreateGame() throws Exception {
+    public void createGame() throws Exception {
         UserData user = new UserData("joe", "joe", "joe");
         var temp = serverFacade.registerUser(user);
         Assertions.assertDoesNotThrow(() ->
@@ -70,7 +70,7 @@ public class ServerFacadeTests {
     }
 
     @Test
-    public void CreateInvalidGame() throws Exception {
+    public void createInvalidGame() throws Exception {
         UserData user = new UserData("jo", "jo", "jo");
         var temp = serverFacade.registerUser(user);
         Assertions.assertThrows(Exception.class, () ->
@@ -78,7 +78,7 @@ public class ServerFacadeTests {
     }
 
     @Test
-    public void ListGames() throws Exception {
+    public void listGames() throws Exception {
         UserData user = new UserData("ben", "ben", "ben");
         var temp = serverFacade.registerUser(user);
         serverFacade.createGame(new CreateGameRequest(temp.authToken(), "game1"));
@@ -91,7 +91,7 @@ public class ServerFacadeTests {
     }
 
     @Test
-    public void JoinGame() throws Exception {
+    public void joinGame() throws Exception {
         UserData user = new UserData("ben", "ben", "ben");
         var temp = serverFacade.registerUser(user);
         serverFacade.createGame(new CreateGameRequest(temp.authToken(), "game1"));
