@@ -1,5 +1,6 @@
 package client;
 
+import model.CreateGameRequest;
 import model.LoginRequest;
 import model.LogoutRequest;
 import model.UserData;
@@ -56,8 +57,19 @@ public class ServerFacadeTests {
     }
 
     @Test
-    public void IllegalLogin() throws Exception {
+    public void CreateGame() throws Exception {
+        UserData user = new UserData("joe", "joe", "joe");
+        var temp = serverFacade.registerUser(user);
+        Assertions.assertDoesNotThrow(() ->
+                serverFacade.createGame(new CreateGameRequest(temp.authToken(), "game1")));
+    }
 
+    @Test
+    public void CreateInvalidGame() throws Exception {
+        UserData user = new UserData("jo", "jo", "jo");
+        var temp = serverFacade.registerUser(user);
+        Assertions.assertThrows(Exception.class, () ->
+                serverFacade.createGame(new CreateGameRequest(temp.authToken(), null)));
     }
 
 }

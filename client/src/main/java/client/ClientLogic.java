@@ -2,10 +2,7 @@ package client;
 
 //import chess.ChessGame;
 
-import model.AuthData;
-import model.LoginRequest;
-import model.LogoutRequest;
-import model.UserData;
+import model.*;
 
 import java.util.Scanner;
 
@@ -58,7 +55,7 @@ public class ClientLogic {
             }
             return switch (inputs[0]) {
                 case "help" -> help();
-                case "quit" -> "quit";
+                case "quit" -> quit();
                 case "logout" -> logout();
                 case "create" -> create(inputs);
                 case "list" -> list();
@@ -69,6 +66,11 @@ public class ClientLogic {
         } catch (SecurityException ex) {
             return ex.getMessage();
         }
+    }
+
+    private String quit() {
+        logout();
+        return "quit";
     }
 
     private String help() {
@@ -138,10 +140,11 @@ public class ClientLogic {
             if (inputs.length != 2) {
                 throw new IllegalArgumentException("Error: incorrect number of arguments");
             }
-        } catch (IllegalArgumentException ex) {
+            CreateGameResponse res = serverFacade.createGame(new CreateGameRequest(authToken, inputs[1]));
+            return "Game with name " + inputs[1] + " created";
+        } catch (Exception ex) {
             return ex.getMessage();
         }
-        return "create";
     }
 
     private String list() {
@@ -184,19 +187,19 @@ public class ClientLogic {
             for (int j = 0; j < 8; j++) {
                 if (i%2 == 0) {
                     if (j%2 == 0) {
-                        System.out.print(SET_TEXT_COLOR_WHITE);
                         System.out.print(SET_BG_COLOR_DARK_GREY);
+                        System.out.print(SET_TEXT_COLOR_WHITE);
                     } else {
-                        System.out.print(SET_BG_COLOR_WHITE);
                         System.out.print(SET_TEXT_COLOR_DARK_GREY);
+                        System.out.print(SET_BG_COLOR_WHITE);
                     }
                 } else {
                     if (j%2 == 0) {
-                        System.out.print(SET_BG_COLOR_WHITE);
                         System.out.print(SET_TEXT_COLOR_DARK_GREY);
+                        System.out.print(SET_BG_COLOR_WHITE);
                     } else {
-                        System.out.print(SET_TEXT_COLOR_WHITE);
                         System.out.print(SET_BG_COLOR_DARK_GREY);
+                        System.out.print(SET_TEXT_COLOR_WHITE);
                     }
                 }
                 System.out.print(" P ");

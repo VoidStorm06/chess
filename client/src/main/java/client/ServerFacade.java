@@ -75,4 +75,27 @@ public class ServerFacade {
             throw new RuntimeException("Server Error: " + ex.getMessage());
         }
     }
+
+    public CreateGameResponse createGame(CreateGameRequest req) throws Exception {
+        if (req.gameName() == null) {
+            throw new IllegalArgumentException("Error: Incorrect number of arguments");
+        }
+        var request = HttpRequest.newBuilder()
+                .uri(URI.create(serverUrl + "/game"))
+                .header("authorization", req.authToken())
+                .method("POST", HttpRequest.BodyPublishers
+                        .ofString(new Gson().toJson(new CreateGameInput(req.gameName()))))
+                .setHeader("Content-Type", "application/json")
+                .build();
+        try {
+            var response = client.send(request, HttpResponse.BodyHandlers.ofString());
+            return new Gson().fromJson(response.body(), CreateGameResponse.class);
+        } catch (Exception ex) {
+            throw new RuntimeException("Server Error: " + ex.getMessage());
+        }
+    }
+
+    public ShowGamesResponse listGames() throws Exception {
+
+    }
 }
