@@ -2,15 +2,18 @@ package client;
 
 //import chess.ChessGame;
 
+import model.AuthData;
+import model.UserData;
+
 import java.util.Scanner;
 
 import static ui.EscapeSequences.*;
 
 public class ClientLogic {
-    //private final String user;
+    private String user;
     private final ServerFacade server;
     boolean loggedIn = false;
-
+    private String authToken;
 
     public ClientLogic(String url) {
         server = new ServerFacade(url);
@@ -28,7 +31,7 @@ public class ClientLogic {
             } else {
                 user = "Logged_Out";
             }
-            System.out.print( user+ " >>> ");
+            System.out.print( user + " >>> ");
             String line = scanner.nextLine();
             try {
                 result = evaluate(line);
@@ -95,6 +98,8 @@ public class ClientLogic {
             return "logged in as " + inputs[1];
         } catch (IllegalArgumentException ex) {
             return ex.getMessage();
+        } catch (Exception ex) {
+            return ex.getMessage();
         }
     }
 
@@ -103,9 +108,12 @@ public class ClientLogic {
             if (inputs.length != 4) {
                 throw new IllegalArgumentException("Error: incorrect number of arguments");
             }
+            AuthData authData = server.registerUser(new UserData(inputs[1], inputs[2], inputs[3]));
+            user = authData.username();
+            authToken = authData.authToken();
             loggedIn = true;
             return "register";
-        } catch (IllegalArgumentException ex) {
+        } catch (Exception ex) {
             return ex.getMessage();
         }
     }
@@ -131,7 +139,11 @@ public class ClientLogic {
     }
 
     private String list() {
-        return "list";
+        try {
+            return "list";
+        } catch (Exception ex) {
+            return ex.getMessage();
+        }
     }
 
     private String play(String[] inputs) {
