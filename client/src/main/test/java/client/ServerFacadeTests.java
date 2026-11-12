@@ -4,10 +4,7 @@ import model.CreateGameRequest;
 import model.LoginRequest;
 import model.LogoutRequest;
 import model.UserData;
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 import server.Server;
 
 
@@ -24,6 +21,10 @@ public class ServerFacadeTests {
         System.out.println("Started test HTTP server on " + port);
         url = String.format("http://localhost:%d", port);
         serverFacade = new ServerFacade(url);
+    }
+
+    @BeforeEach
+    public void start() throws Exception {
         serverFacade.deleteAll();
     }
 
@@ -35,9 +36,8 @@ public class ServerFacadeTests {
 
     @Test
     public void registerTest() throws Exception {
-        UserData user = new UserData("bob", "bob", "bob");
-        var temp = serverFacade.registerUser(user);
-        Assertions.assertNotNull(serverFacade.registerUser(user));
+        UserData user = new UserData("boring", "bob", "bob");
+        var temp = Assertions.assertDoesNotThrow(() -> serverFacade.registerUser(user));
         Assertions.assertEquals(user.username(), temp.username());
     }
 
@@ -84,4 +84,6 @@ public class ServerFacadeTests {
         games = Assertions.assertDoesNotThrow(() -> serverFacade.listGames(temp.authToken()));
         Assertions.assertEquals(3, games.size());
     }
+
+
 }

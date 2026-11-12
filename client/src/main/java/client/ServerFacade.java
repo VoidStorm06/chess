@@ -44,6 +44,9 @@ public class ServerFacade {
                 .build();
         try {
             var response = client.send(request, HttpResponse.BodyHandlers.ofString());
+            if (!codeIsGood(response.statusCode())) {
+                throw new RuntimeException("Couldn't register user, try again" + String.valueOf(response.statusCode()));
+            }
             return new Gson().fromJson(response.body(), AuthData.class);
         } catch (Exception ex) {
             throw new RuntimeException("Server Error: " + ex.getMessage());
@@ -61,6 +64,9 @@ public class ServerFacade {
                 .build();
         try {
             var response = client.send(request, HttpResponse.BodyHandlers.ofString());
+            if (!codeIsGood(response.statusCode())) {
+                throw new RuntimeException("Couldn't login user, try again");
+            }
             return new Gson().fromJson(response.body(), AuthData.class);
         } catch (Exception ex) {
             throw new RuntimeException("Server Error: " + ex.getMessage());
@@ -74,7 +80,10 @@ public class ServerFacade {
                 .header("authorization", req.authToken())
                 .build();
         try {
-            client.send(request, HttpResponse.BodyHandlers.ofString());
+            var response = client.send(request, HttpResponse.BodyHandlers.ofString());
+            if (!codeIsGood(response.statusCode())) {
+                throw new RuntimeException("Couldn't logout user, try again");
+            }
         } catch (Exception ex) {
             throw new RuntimeException("Server Error: " + ex.getMessage());
         }
@@ -93,6 +102,9 @@ public class ServerFacade {
                 .build();
         try {
             var response = client.send(request, HttpResponse.BodyHandlers.ofString());
+            if (!codeIsGood(response.statusCode())) {
+                throw new RuntimeException("Couldn't create game, try again");
+            }
             return new Gson().fromJson(response.body(), CreateGameResponse.class);
         } catch (Exception ex) {
             throw new RuntimeException("Server Error: " + ex.getMessage());
@@ -108,10 +120,36 @@ public class ServerFacade {
         try {
             Type type = new TypeToken<Map<String, Collection<ShowGamesResponse>>>() {}.getType();
             var response = client.send(request, HttpResponse.BodyHandlers.ofString());
+            if (!codeIsGood(response.statusCode())) {
+                throw new RuntimeException("Couldn't access list of games, please try again");
+            }
             Map<String, Collection<ShowGamesResponse>> games = new Gson().fromJson(response.body(), type);
             return games.get("games");
         } catch (Exception ex) {
             throw new RuntimeException("Server Error: " + ex.getMessage());
         }
+    }
+
+    public void joinGame(String authToken, int gameId, String playerColor) throws  Exception {
+        var request = HttpRequest.newBuilder()
+                .uri(URI.create(serverUrl + "/game"))
+                .header("authorization", authToken)
+                .method("PUT", HttpRequest.BodyPublishers
+                        .ofString(new Gson().toJson(new JoinRequest(playerColor, gameId))))
+                .setHeader("Content-Type", "application/json")
+                .build();
+        try {
+            var response = client.send(request, HttpResponse.BodyHandlers.ofString());
+            if (!codeIsGood(response.statusCode())) {
+                throw new RuntimeException("Couldn't join/observe game, please try again");
+            }
+        } catch (Exception ex) {
+            throw new RuntimeException("Server Error: " + ex.getMessage());
+        }
+    }
+
+    private boolean codeIsGood(int code) {
+        return code/100 == 2;
+
     }
 }

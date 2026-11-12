@@ -1,9 +1,12 @@
 package client;
 
-//import chess.ChessGame;
+import chess.ChessGame;
 
+import chess.ChessPiece;
+import chess.ChessPosition;
 import model.*;
 
+import java.util.Objects;
 import java.util.Scanner;
 
 import static ui.EscapeSequences.*;
@@ -22,7 +25,6 @@ public class ClientLogic {
         System.out.println("Welcome to Chess! Type 'help' to get started");
         Scanner scanner = new Scanner(System.in);
         var result = "";
-        printGame();
         while (!result.equals("quit")) {
             String user;
             if (loggedIn) {
@@ -34,6 +36,9 @@ public class ClientLogic {
             String line = scanner.nextLine();
             try {
                 result = evaluate(line);
+                if (result.equals("quit")) {
+                    System.out.println("quiting application");
+                }
                 System.out.println(result);
             } catch (Exception ex) {
                 System.out.println(ex.getMessage());
@@ -167,10 +172,11 @@ public class ClientLogic {
                 }
                 index++;
                 String currGame = Integer.toString(index) + " Game name: " + game.gameName() +
-                        ". White Player: " + whiteUser + ". Black Player: " + blackUser + ".";
+                        ". White Player: " + whiteUser + ". Black Player: " + blackUser + ". GameID: "
+                        + Integer.toString(game.gameID());
                 response.append(currGame).append("\n");
             }
-            return "";
+            return response.toString();
         } catch (Exception ex) {
             return ex.getMessage();
         }
@@ -181,10 +187,21 @@ public class ClientLogic {
             if (inputs.length != 3) {
                 throw new IllegalArgumentException("Error: incorrect number of arguments");
             }
+            try {
+                var temp = Integer.parseInt(inputs[1]);
+            } catch (Exception ex) {
+                throw new IllegalArgumentException("Error: not a valid game ID");
+            }
             if (!inputs[2].equals("white") && !inputs[2].equals("black")) {
                 throw new IllegalArgumentException("Error: must be join game as WHITE or BLACK player");
             }
-            return "play";
+            serverFacade.joinGame(authToken, Integer.parseInt(inputs[1]), inputs[2]);
+            if (inputs[2].equals("white")) {
+                printGame(new ChessGame(), "white");
+            } else {
+                printGame(new ChessGame(), "black");
+            }
+            return "";
         } catch (Exception ex) {
             return ex.getMessage();
         }
@@ -195,40 +212,81 @@ public class ClientLogic {
             if (inputs.length != 2) {
                 throw new IllegalArgumentException("Error: incorrect number of arguments");
             }
-            return "observe";
+            try {
+                var temp = Integer.parseInt(inputs[1]);
+            } catch (Exception ex) {
+                throw new IllegalArgumentException("Error: not a valid Game ID");
+            }
+            serverFacade.joinGame(authToken, Integer.parseInt(inputs[1]), "observer");
+            printGame(new ChessGame(), "white");
+            return "";
         } catch (Exception ex) {
             return ex.getMessage();
         }
     }
 
-    private void printGame() {
-        System.out.println("   A  B  C  D  E  F  G  H  ");
-        for (int i = 0; i < 8; i++) {
-            System.out.print(String.valueOf(i+1) + " ");
-            for (int j = 0; j < 8; j++) {
+    private void printGame(ChessGame game, String playerColor) {
+        String columns = "   A  B  C  D  E  F  G  H  ";
+        if (playerColor.equals("black")) {
+            columns = "   H  G  F  E  D  C  B  A  ";
+        }
+        System.out.println(columns);
+        for (int i = 1; i < 9; i++) {
+            if (playerColor.equals("black")) {
+                System.out.print(String.valueOf(i) + " ");
+            } else {
+                System.out.print(String.valueOf(9-i) + " ");
+            }
+            for (int j = 1; j < 9; j++) {
                 if (i%2 == 0) {
                     if (j%2 == 0) {
-                        System.out.print(SET_BG_COLOR_DARK_GREY);
+                        System.out.print(SET_BG_COLOR_WHITE);
                         System.out.print(SET_TEXT_COLOR_WHITE);
                     } else {
+                        System.out.print(SET_BG_COLOR_DARK_GREY);
                         System.out.print(SET_TEXT_COLOR_DARK_GREY);
-                        System.out.print(SET_BG_COLOR_WHITE);
                     }
                 } else {
                     if (j%2 == 0) {
-                        System.out.print(SET_TEXT_COLOR_DARK_GREY);
-                        System.out.print(SET_BG_COLOR_WHITE);
-                    } else {
                         System.out.print(SET_BG_COLOR_DARK_GREY);
+                        System.out.print(SET_TEXT_COLOR_DARK_GREY);
+                    } else {
+                        System.out.print(SET_BG_COLOR_WHITE);
                         System.out.print(SET_TEXT_COLOR_WHITE);
                     }
                 }
-                System.out.print(" P ");
+                ChessPiece piece;
+                if (playerColor.equals("black")) {
+                    piece = game.getBoard().getPiece(new ChessPosition(i, 9-j));
+                } else {
+                    piece = game.getBoard().getPiece(new ChessPosition(9-i, j));
+                }
+                if (piece != null) {
+                    if (piece.getTeamColor() == ChessGame.TeamColor.BLACK) {
+                        System.out.print(SET_TEXT_COLOR_RED);
+                    } else {
+                        System.out.print(SET_TEXT_COLOR_BLUE);
+                    }
+                    switch (piece.getPieceType()) {
+                        case KING -> System.out.print(" K ");
+                        case QUEEN -> System.out.print(" Q ");
+                        case ROOK -> System.out.print(" R ");
+                        case BISHOP -> System.out.print(" B ");
+                        case KNIGHT -> System.out.print(" N ");
+                        default -> System.out.print(" P ");
+                    }
+                } else {
+                    System.out.print(" E ");
+                }
             }
             System.out.print(RESET_TEXT_COLOR);
             System.out.print(RESET_BG_COLOR);
-            System.out.println(" " + String.valueOf(i+1));
+            if (playerColor.equals("black")) {
+                System.out.println(" " + String.valueOf(i));
+            } else {
+                System.out.println(" " + String.valueOf(9-i));
+            }
         }
-        System.out.println("   A  B  C  D  E  F  G  H  ");
+        System.out.println(columns);
     }
 }

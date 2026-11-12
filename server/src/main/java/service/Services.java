@@ -6,6 +6,7 @@ import model.*;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Locale;
 
 public class Services {
 
@@ -79,18 +80,21 @@ public class Services {
             throw new DataAccessException("bad request");
         }
         GameData updateGame;
-        if (request.playerColor().equals("BLACK")) {
+        if (request.playerColor().equalsIgnoreCase("BLACK")) {
             if (game.blackUsername() != null) {
                 throw new DataAccessException("Already taken");
             }
             updateGame = new GameData(request.gameID(), game.whiteUsername(),
                     dataAccess.getAuth(authData).username(), game.gameName(), game.game());
-        } else if (request.playerColor().equals("WHITE")) {
+        } else if (request.playerColor().equalsIgnoreCase("WHITE")) {
             if (game.whiteUsername() != null) {
                 throw new DataAccessException("Already taken");
 
             }
             updateGame = new GameData(request.gameID(), dataAccess.getAuth(authData).username(),
+                    game.blackUsername(), game.gameName(), game.game());
+        } else if (request.playerColor().equalsIgnoreCase("observer")) {
+            updateGame = new GameData(request.gameID(), game.whiteUsername(),
                     game.blackUsername(), game.gameName(), game.game());
         } else {
             throw new DataAccessException("bad request");
