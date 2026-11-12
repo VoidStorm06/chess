@@ -5,8 +5,7 @@ import dataaccess.DataAccessException;
 import dataaccess.sql.SQLDAO;
 import io.javalin.*;
 import io.javalin.http.Context;
-import model.AuthData;
-import model.UserData;
+import model.*;
 import service.*;
 
 import java.util.Collection;
@@ -75,7 +74,7 @@ public class Server {
 
     private void createGameHandler(Context context) throws DataAccessException {
         String authToken = context.header("authorization");
-        service.CreateGameInput input = new Gson().fromJson(context.body(), CreateGameInput.class);
+        CreateGameInput input = new Gson().fromJson(context.body(), CreateGameInput.class);
         CreateGameRequest createGameRequest = new CreateGameRequest(authToken, input.gameName());
         CreateGameResponse gameCreated = services.createNewGame(createGameRequest);
         context.result(new Gson().toJson(gameCreated));

@@ -3,6 +3,7 @@ package client;
 import com.google.gson.Gson;
 import model.AuthData;
 import model.GameData;
+import model.LoginRequest;
 import model.UserData;
 
 import java.net.URI;
@@ -47,11 +48,20 @@ public class ServerFacade {
         }
     }
 
-    public AuthData loginUser(UserData userData) throws Exception {
-        if (userData.password() == null || userData.username() == null || userData.email() == null) {
+    public AuthData loginUser(LoginRequest req) throws Exception {
+        if (req.password() == null || req.username() == null) {
             throw new IllegalArgumentException("Error: Incorrect number of arguments");
         }
         var request = HttpRequest.newBuilder()
-                .uri(URI.create(serverUrl + ""))
+                .uri(URI.create(serverUrl + "/session"))
+                .method("POST", HttpRequest.BodyPublishers.ofString(new Gson().toJson(req)))
+                .setHeader("Content-Type", "application/json")
+                .build();
+        try {
+            var response = client.send(request, HttpResponse.BodyHandlers.ofString());
+            return new Gson().fromJson(response.body(), AuthData.class);
+        } catch (Exception ex) {
+            throw new RuntimeException("Server Error: " + ex.getMessage());
+        }
     }
 }

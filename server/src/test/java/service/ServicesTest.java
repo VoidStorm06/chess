@@ -3,7 +3,7 @@ package service;
 import dataaccess.DAO;
 import dataaccess.DataAccessException;
 import dataaccess.MemoryDAO;
-import model.UserData;
+import model.*;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;

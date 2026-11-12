@@ -2,10 +2,7 @@ package service;
 
 import dataaccess.DAO;
 import dataaccess.DataAccessException;
-import dataaccess.MemoryDAO;
-import model.AuthData;
-import model.GameData;
-import model.UserData;
+import model.*;
 
 import java.util.ArrayList;
 import java.util.Collection;

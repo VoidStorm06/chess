@@ -1,6 +1,4 @@
-package service;
-
-import chess.ChessGame;
+package model;
 
 public record JoinRequest(String playerColor, Integer gameID) {
 }

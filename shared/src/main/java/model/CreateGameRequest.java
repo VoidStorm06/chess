@@ -1,6 +1,4 @@
-package service;
-
-import model.AuthData;
+package model;
 
 public record CreateGameRequest(String authToken, String gameName) {
 }

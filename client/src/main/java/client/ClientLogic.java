@@ -3,6 +3,7 @@ package client;
 //import chess.ChessGame;
 
 import model.AuthData;
+import model.LoginRequest;
 import model.UserData;
 
 import java.util.Scanner;
@@ -94,6 +95,9 @@ public class ClientLogic {
             if (inputs.length != 3) {
                 throw new IllegalArgumentException("Error: incorrect number of arguments");
             }
+            AuthData authData = server.loginUser(new LoginRequest(inputs[1], inputs[2]));
+            user = authData.username();
+            authToken = authData.authToken();
             loggedIn = true;
             return "logged in as " + inputs[1];
         } catch (IllegalArgumentException ex) {
