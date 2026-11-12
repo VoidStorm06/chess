@@ -158,24 +158,28 @@ public class ClientLogic {
             int index = 0;
             StringBuilder response = new StringBuilder();
             System.out.println("List of Games on Server");
-            for (var game : gameList) {
-                String whiteUser;
-                String blackUser;
-                if (game.whiteUsername() == null) {
-                    whiteUser = "None";
-                } else {
-                    whiteUser = game.whiteUsername();
+            if (gameList.isEmpty()) {
+                System.out.println("No available games on server");
+            } else {
+                for (var game : gameList) {
+                    String whiteUser;
+                    String blackUser;
+                    if (game.whiteUsername() == null) {
+                        whiteUser = "None";
+                    } else {
+                        whiteUser = game.whiteUsername();
+                    }
+                    if (game.blackUsername() == null) {
+                        blackUser = "None";
+                    } else {
+                        blackUser = game.blackUsername();
+                    }
+                    index++;
+                    String currGame = Integer.toString(index) + "- Game name: " + game.gameName() +
+                            ". White Player: " + whiteUser + ". Black Player: " + blackUser + ". GameID: "
+                            + Integer.toString(game.gameID());
+                    response.append(currGame).append("\n");
                 }
-                if (game.blackUsername() == null) {
-                    blackUser = "None";
-                } else {
-                    blackUser = game.blackUsername();
-                }
-                index++;
-                String currGame = Integer.toString(index) + "- Game name: " + game.gameName() +
-                        ". White Player: " + whiteUser + ". Black Player: " + blackUser + ". GameID: "
-                        + Integer.toString(game.gameID());
-                response.append(currGame).append("\n");
             }
             return response.toString();
         } catch (Exception ex) {

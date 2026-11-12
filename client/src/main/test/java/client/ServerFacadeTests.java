@@ -28,6 +28,11 @@ public class ServerFacadeTests {
         serverFacade.deleteAll();
     }
 
+    @AfterEach
+    public void end() throws Exception {
+        serverFacade.deleteAll();
+    }
+
     @AfterAll
     static void stopServer() {
         server.stop();
