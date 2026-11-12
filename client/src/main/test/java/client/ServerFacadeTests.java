@@ -85,5 +85,16 @@ public class ServerFacadeTests {
         Assertions.assertEquals(3, games.size());
     }
 
-
+    @Test
+    public void JoinGame() throws Exception {
+        UserData user = new UserData("ben", "ben", "ben");
+        var temp = serverFacade.registerUser(user);
+        serverFacade.createGame(new CreateGameRequest(temp.authToken(), "game1"));
+        Assertions.assertDoesNotThrow(() -> serverFacade.joinGame(temp.authToken(), 1, "WHITE"));
+        serverFacade.logoutUser(new LogoutRequest(temp.authToken()));
+        UserData newUser = new UserData("bill", "bill", "bill");
+        var auth = serverFacade.registerUser(newUser);
+        Assertions.assertThrows(Exception.class, () -> serverFacade.joinGame(auth.authToken(), 1, "WHITE"));
+        Assertions.assertDoesNotThrow(() -> serverFacade.joinGame(auth.authToken(), 1, "BLACK"));
+    }
 }
