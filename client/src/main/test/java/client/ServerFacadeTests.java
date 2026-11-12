@@ -1,5 +1,7 @@
 package client;
 
+import model.LoginRequest;
+import model.LogoutRequest;
 import model.UserData;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.Assertions;
@@ -39,9 +41,23 @@ public class ServerFacadeTests {
     }
 
     @Test
-    public void badRegisterTest() throws Exception {
+    public void badRegisterTest() {
         UserData user = new UserData("bob", "bob", null);
         Assertions.assertThrows(IllegalArgumentException.class, () -> serverFacade.registerUser(user));
+    }
+
+    @Test
+    public void LoginTest() throws Exception {
+        UserData user = new UserData("bo", "bo", "bob");
+        var temp = serverFacade.registerUser(user);
+        serverFacade.logoutUser(new LogoutRequest(temp.authToken()));
+        var auth = Assertions.assertDoesNotThrow(() ->
+                serverFacade.loginUser(new LoginRequest("bo", "bo")));
+    }
+
+    @Test
+    public void IllegalLogin() throws Exception {
+
     }
 
 }

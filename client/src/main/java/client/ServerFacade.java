@@ -1,10 +1,7 @@
 package client;
 
 import com.google.gson.Gson;
-import model.AuthData;
-import model.GameData;
-import model.LoginRequest;
-import model.UserData;
+import model.*;
 
 import java.net.URI;
 import java.net.http.HttpClient;
@@ -25,7 +22,8 @@ public class ServerFacade {
                 .method("DELETE", HttpRequest.BodyPublishers.noBody())
                 .build();
         try {
-            client.send(request, HttpResponse.BodyHandlers.ofString());
+            HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+            String temp = response.body();
         } catch (Exception ex) {
             throw new RuntimeException("Server Error: " + ex.getMessage());
         }
@@ -60,6 +58,19 @@ public class ServerFacade {
         try {
             var response = client.send(request, HttpResponse.BodyHandlers.ofString());
             return new Gson().fromJson(response.body(), AuthData.class);
+        } catch (Exception ex) {
+            throw new RuntimeException("Server Error: " + ex.getMessage());
+        }
+    }
+
+    public void logoutUser(LogoutRequest req) throws Exception {
+        var request = HttpRequest.newBuilder()
+                .uri(URI.create(serverUrl + "/session/"))
+                .method("DELETE", HttpRequest.BodyPublishers.noBody())
+                .header("authorization", req.authToken())
+                .build();
+        try {
+            client.send(request, HttpResponse.BodyHandlers.ofString());
         } catch (Exception ex) {
             throw new RuntimeException("Server Error: " + ex.getMessage());
         }

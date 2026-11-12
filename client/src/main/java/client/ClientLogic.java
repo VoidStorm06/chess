@@ -4,6 +4,7 @@ package client;
 
 import model.AuthData;
 import model.LoginRequest;
+import model.LogoutRequest;
 import model.UserData;
 
 import java.util.Scanner;
@@ -11,13 +12,13 @@ import java.util.Scanner;
 import static ui.EscapeSequences.*;
 
 public class ClientLogic {
-    private String user;
-    private final ServerFacade server;
+    private String user = null;
+    private final ServerFacade serverFacade;
     boolean loggedIn = false;
     private String authToken;
 
     public ClientLogic(String url) {
-        server = new ServerFacade(url);
+        serverFacade = new ServerFacade(url);
     }
 
     public void run() {
@@ -95,13 +96,11 @@ public class ClientLogic {
             if (inputs.length != 3) {
                 throw new IllegalArgumentException("Error: incorrect number of arguments");
             }
-            AuthData authData = server.loginUser(new LoginRequest(inputs[1], inputs[2]));
+            AuthData authData = serverFacade.loginUser(new LoginRequest(inputs[1], inputs[2]));
             user = authData.username();
             authToken = authData.authToken();
             loggedIn = true;
             return "logged in as " + inputs[1];
-        } catch (IllegalArgumentException ex) {
-            return ex.getMessage();
         } catch (Exception ex) {
             return ex.getMessage();
         }
@@ -112,11 +111,11 @@ public class ClientLogic {
             if (inputs.length != 4) {
                 throw new IllegalArgumentException("Error: incorrect number of arguments");
             }
-            AuthData authData = server.registerUser(new UserData(inputs[1], inputs[2], inputs[3]));
+            AuthData authData = serverFacade.registerUser(new UserData(inputs[1], inputs[2], inputs[3]));
             user = authData.username();
             authToken = authData.authToken();
             loggedIn = true;
-            return "register";
+            return "registered as " + inputs[1];
         } catch (Exception ex) {
             return ex.getMessage();
         }
@@ -124,8 +123,11 @@ public class ClientLogic {
 
     private String logout() {
         try {
+            serverFacade.logoutUser(new LogoutRequest(authToken));
             loggedIn = false;
-            return "logout";
+            authToken = null;
+            user = null;
+            return "logged out";
         } catch (Exception ex) {
             return "Error: failed to log out";
         }
@@ -182,19 +184,19 @@ public class ClientLogic {
             for (int j = 0; j < 8; j++) {
                 if (i%2 == 0) {
                     if (j%2 == 0) {
-                        System.out.print(SET_BG_COLOR_DARK_GREY);
                         System.out.print(SET_TEXT_COLOR_WHITE);
+                        System.out.print(SET_BG_COLOR_DARK_GREY);
                     } else {
-                        System.out.print(SET_TEXT_COLOR_DARK_GREY);
                         System.out.print(SET_BG_COLOR_WHITE);
+                        System.out.print(SET_TEXT_COLOR_DARK_GREY);
                     }
                 } else {
                     if (j%2 == 0) {
-                        System.out.print(SET_TEXT_COLOR_DARK_GREY);
                         System.out.print(SET_BG_COLOR_WHITE);
+                        System.out.print(SET_TEXT_COLOR_DARK_GREY);
                     } else {
-                        System.out.print(SET_BG_COLOR_DARK_GREY);
                         System.out.print(SET_TEXT_COLOR_WHITE);
+                        System.out.print(SET_BG_COLOR_DARK_GREY);
                     }
                 }
                 System.out.print(" P ");
