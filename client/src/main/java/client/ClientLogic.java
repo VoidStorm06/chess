@@ -149,7 +149,28 @@ public class ClientLogic {
 
     private String list() {
         try {
-            return "list";
+            var gameList = serverFacade.listGames(authToken);
+            int index = 0;
+            StringBuilder response = new StringBuilder();
+            for (var game : gameList) {
+                String whiteUser;
+                String blackUser;
+                if (game.whiteUsername().isEmpty()) {
+                    whiteUser = "None";
+                } else {
+                    whiteUser = game.whiteUsername();
+                }
+                if (game.blackUsername().isEmpty()) {
+                    blackUser = "None";
+                } else {
+                    blackUser = game.blackUsername();
+                }
+                index++;
+                String currGame = Integer.toString(index) + " Game name: " + game.gameName() +
+                        ". White Player: " + whiteUser + ". Black Player: " + blackUser + ".";
+                response.append(currGame).append("\n");
+            }
+            return "";
         } catch (Exception ex) {
             return ex.getMessage();
         }

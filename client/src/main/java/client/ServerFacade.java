@@ -1,12 +1,16 @@
 package client;
 
 import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 import model.*;
 
+import java.lang.reflect.Type;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.util.Collection;
+import java.util.Map;
 
 public class ServerFacade {
     private final HttpClient client = HttpClient.newHttpClient();
@@ -95,7 +99,19 @@ public class ServerFacade {
         }
     }
 
-    public ShowGamesResponse listGames() throws Exception {
-
+    public Collection<ShowGamesResponse> listGames(String authToken) throws Exception {
+        var request = HttpRequest.newBuilder()
+                .uri(URI.create(serverUrl + "/game"))
+                .header("authorization", authToken)
+                .method("GET", HttpRequest.BodyPublishers.noBody())
+                .build();
+        try {
+            Type type = new TypeToken<Map<String, Collection<ShowGamesResponse>>>() {}.getType();
+            var response = client.send(request, HttpResponse.BodyHandlers.ofString());
+            Map<String, Collection<ShowGamesResponse>> games = new Gson().fromJson(response.body(), type);
+            return games.get("games");
+        } catch (Exception ex) {
+            throw new RuntimeException("Server Error: " + ex.getMessage());
+        }
     }
 }

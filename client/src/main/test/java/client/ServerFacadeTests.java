@@ -72,4 +72,16 @@ public class ServerFacadeTests {
                 serverFacade.createGame(new CreateGameRequest(temp.authToken(), null)));
     }
 
+    @Test
+    public void ListGames() throws Exception {
+        UserData user = new UserData("ben", "ben", "ben");
+        var temp = serverFacade.registerUser(user);
+        serverFacade.createGame(new CreateGameRequest(temp.authToken(), "game1"));
+        serverFacade.createGame(new CreateGameRequest(temp.authToken(), "game2"));
+        var games = Assertions.assertDoesNotThrow(() -> serverFacade.listGames(temp.authToken()));
+        Assertions.assertEquals(2, games.size());
+        serverFacade.createGame(new CreateGameRequest(temp.authToken(), "game3"));
+        games = Assertions.assertDoesNotThrow(() -> serverFacade.listGames(temp.authToken()));
+        Assertions.assertEquals(3, games.size());
+    }
 }
